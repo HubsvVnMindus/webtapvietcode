@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f0f2f5;
+      background-color: #fff; /* Nền trắng tinh */
       min-height: 100vh;
     }
     .form-container {
@@ -91,7 +91,7 @@
       top: 10px;
       left: 10px;
       cursor: pointer;
-      display: none;
+      z-index: 1000; /* Đảm bảo hamburger luôn ở trên cùng */
     }
     .hamburger div {
       width: 25px;
@@ -108,6 +108,7 @@
       background: #333;
       color: white;
       transition: left 0.3s;
+      z-index: 999; /* Đảm bảo sidebar ở dưới hamburger nhưng trên nội dung */
     }
     .sidebar.open {
       left: 0;
@@ -180,6 +181,11 @@
 
   <!-- Đăng ký -->
   <div id="register-section" class="form-container">
+    <div class="hamburger" id="hamburger-reg">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Đăng ký</h2>
     <form id="register-form" onsubmit="register(event)">
       <div class="form-group">
@@ -197,6 +203,11 @@
 
   <!-- Đăng nhập -->
   <div id="login-section" class="form-container">
+    <div class="hamburger" id="hamburger-login">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Đăng nhập</h2>
     <form id="login-form" onsubmit="login(event)">
       <div class="form-group">
@@ -214,6 +225,11 @@
 
   <!-- Tài khoản -->
   <div id="account-section" class="form-container">
+    <div class="hamburger" id="hamburger-account">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Quản lý tài khoản</h2>
     <div class="form-group">
       <h3>Avatar</h3>
@@ -240,6 +256,11 @@
 
   <!-- Lựa chọn nội dung (người dùng thường) -->
   <div id="options-section" class="form-container">
+    <div class="hamburger" id="hamburger-options">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Chọn nội dung</h2>
     <div class="options">
       <button onclick="showSection('vng')">Client VNG</button>
@@ -251,6 +272,11 @@
 
   <!-- Hiển thị file Client VNG -->
   <div id="vng-section" class="form-container">
+    <div class="hamburger" id="hamburger-vng">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Danh sách file Client VNG</h2>
     <ul id="vng-files-user" class="file-list"></ul>
     <button onclick="showSection('options')">Quay lại</button>
@@ -258,6 +284,11 @@
 
   <!-- Hiển thị file Client Quốc tế -->
   <div id="international-section" class="form-container">
+    <div class="hamburger" id="hamburger-international">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Danh sách file Client Quốc tế</h2>
     <ul id="international-files-user" class="file-list"></ul>
     <button onclick="showSection('options')">Quay lại</button>
@@ -265,6 +296,11 @@
 
   <!-- Hiển thị Script và Hình ảnh -->
   <div id="script-section" class="form-container">
+    <div class="hamburger" id="hamburger-script">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Danh sách Script</h2>
     <ul id="script-list-user" class="file-list"></ul>
     <h2>Danh sách Hình ảnh</h2>
@@ -274,6 +310,11 @@
 
   <!-- Giao diện admin -->
   <div id="admin-section" class="form-container">
+    <div class="hamburger" id="hamburger-admin">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
     <h2>Quản lý Admin</h2>
     <div class="form-group">
       <h3>Avatar Admin</h3>
@@ -352,7 +393,7 @@
       script: document.getElementById('script-section'),
       admin: document.getElementById('admin-section')
     };
-    const hamburger = document.getElementById('hamburger');
+    const hamburgers = document.querySelectorAll('.hamburger');
     const loginPrompt = document.getElementById('login-prompt');
     const authButtons = document.getElementById('auth-buttons');
     const socialLinksSection = document.getElementById('social-links');
@@ -363,16 +404,18 @@
       if (!sections.home.classList.contains('active')) {
         sections.home.classList.add('active');
       }
+      // Gắn sự kiện click cho tất cả hamburger menus
+      hamburgers.forEach(hamburger => {
+        hamburger.addEventListener('click', toggleMenu);
+      });
     });
 
     function updateLoginState() {
       if (!currentUser) {
-        hamburger.classList.add('hidden');
         loginPrompt.classList.remove('hidden');
         authButtons.classList.remove('hidden');
         socialLinksSection.classList.add('hidden');
       } else {
-        hamburger.classList.remove('hidden');
         loginPrompt.classList.add('hidden');
         authButtons.classList.add('hidden');
         socialLinksSection.classList.remove('hidden');
@@ -401,7 +444,11 @@
     };
 
     window.navigate = function(section) {
-      if (!currentUser) return;
+      if (!currentUser) {
+        alert('Vui lòng đăng nhập để truy cập!');
+        showSection('login');
+        return;
+      }
       if (section === 'admin' && currentUser.role !== 'admin') {
         alert('Chỉ admin mới có quyền truy cập!');
         return;
@@ -651,4 +698,4 @@
     updateSocialLinks();
   </script>
 </body>
-  </html>
+                          </html>
