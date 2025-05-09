@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #fff; /* Nền trắng tinh */
+      background-color: #fff;
       min-height: 100vh;
       line-height: 1.6;
     }
@@ -77,6 +77,10 @@
       border-radius: 8px;
       margin: 10px 0;
       border-left: 4px solid #1a73e8;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
     }
     .social-links ul {
       list-style: none;
@@ -241,7 +245,7 @@
       <span class="close-btn" onclick="toggleMenu()">×</span>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#" onclick="navigate('content')">Xem nội dung</a></li>
+      <li><a href="#" onclick="navigate('options')">Xem nội dung</a></li>
       <li><a href="#" onclick="navigate('account')">Tài khoản</a></li>
       <li><a href="#" onclick="navigate('admin')">Admin</a></li>
       <li><a href="#" onclick="logout()">Đăng xuất</a></li>
@@ -499,7 +503,6 @@
       if (!sections.home.classList.contains('active')) {
         sections.home.classList.add('active');
       }
-      // Gắn sự kiện click cho tất cả hamburger menus
       hamburgers.forEach(hamburger => {
         hamburger.addEventListener('click', toggleMenu);
       });
@@ -527,7 +530,9 @@
         sections.home.classList.add('active');
       }
       sidebar.classList.remove('open');
-      if (section === 'options' || section === 'vng' || section === 'international' || section === 'script') loadUserData(section);
+      if (section === 'options' || section === 'vng' || section === 'international' || section === 'script') {
+        loadUserData(section);
+      }
       if (section === 'account') loadAccountData();
       if (section === 'admin') loadAdminData();
       updateLoginState();
@@ -547,6 +552,7 @@
         alert('Chỉ admin mới có quyền truy cập!');
         return;
       }
+      // Sử dụng section trực tiếp thay vì ánh xạ
       showSection(section);
     };
 
