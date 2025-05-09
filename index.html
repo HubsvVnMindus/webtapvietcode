@@ -4,30 +4,146 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đăng ký & Đăng nhập</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .form-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      display: none;
+    }
+    .form-container.active {
+      display: block;
+    }
+    h2 {
+      text-align: center;
+      color: #1a1a1a;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1557b0;
+    }
+    .auth-buttons button {
+      margin: 5px 0;
+    }
+    .social-links ul {
+      list-style: none;
+      padding: 0;
+    }
+    .social-links li a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #1a73e8;
+    }
+    .hamburger {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      display: none;
+    }
+    .hamburger div {
+      width: 25px;
+      height: 3px;
+      background: #333;
+      margin: 5px 0;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #333;
+      color: white;
+      transition: left 0.3s;
+    }
+    .sidebar.open {
+      left: 0;
+    }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      background: #444;
+    }
+    .close-btn {
+      cursor: pointer;
+    }
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar-menu li a {
+      display: block;
+      padding: 10px;
+      color: white;
+      text-decoration: none;
+    }
+    .sidebar-menu li a:hover {
+      background: #555;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Trang chủ -->
-  <div id="home-section" class="form-container">
-    <div class="hamburger hidden" id="hamburger" onclick="toggleMenu()">
+  <div id="home-section" class="form-container active">
+    <div class="hamburger" id="hamburger">
       <div class="bar"></div>
       <div class="bar"></div>
       <div class="bar"></div>
     </div>
     <h2>Chào mừng đến với hệ thống</h2>
-    <p id="login-prompt" class="hidden">Vui lòng đăng nhập để tiếp tục.</p>
+    <p id="login-prompt">Vui lòng đăng nhập để tiếp tục.</p>
     <div id="auth-buttons" class="auth-buttons">
-      <button id="to-register-btn" class="auth-btn">Đăng ký</button>
-      <button id="to-login-btn" class="auth-btn">Đăng nhập</button>
+      <button onclick="showSection('register')">Đăng ký</button>
+      <button onclick="showSection('login')">Đăng nhập</button>
     </div>
     <div id="social-links" class="social-links hidden">
       <h3>Liên kết mạng xã hội</h3>
-      <ul class="social-list">
-        <li><a href="#" id="facebook-link" onclick="openSocialLink('facebook')">Facebook</a></li>
-        <li><a href="#" id="zalo-link" onclick="openSocialLink('zalo')">Zalo</a></li>
-        <li><a href="#" id="tiktok-link" onclick="openSocialLink('tiktok')">TikTok</a></li>
-        <li><a href="#" id="youtube-link" onclick="openSocialLink('youtube')">Youtube</a></li>
-        <li><a href="#" onclick="navigateToHome()">Trang chủ</a></li>
+      <ul>
+        <li><a href="#" onclick="openSocialLink('facebook')">Facebook</a></li>
+        <li><a href="#" onclick="openSocialLink('zalo')">Zalo</a></li>
+        <li><a href="#" onclick="openSocialLink('tiktok')">TikTok</a></li>
+        <li><a href="#" onclick="openSocialLink('youtube')">Youtube</a></li>
+        <li><a href="#" onclick="showSection('home')">Trang chủ</a></li>
       </ul>
     </div>
   </div>
@@ -46,9 +162,9 @@
   </div>
 
   <!-- Đăng ký -->
-  <div id="register-section" class="form-container hidden">
+  <div id="register-section" class="form-container">
     <h2>Đăng ký</h2>
-    <form id="register-form">
+    <form id="register-form" onsubmit="register(event)">
       <div class="form-group">
         <label>Tên người dùng</label>
         <input type="text" id="reg-username" required>
@@ -59,13 +175,13 @@
       </div>
       <button type="submit">Đăng ký</button>
     </form>
-    <p>Đã có tài khoản? <a href="#" id="to-login">Đăng nhập</a></p>
+    <p>Đã có tài khoản? <a href="#" onclick="showSection('login')">Đăng nhập</a></p>
   </div>
 
   <!-- Đăng nhập -->
-  <div id="login-section" class="form-container hidden">
+  <div id="login-section" class="form-container">
     <h2>Đăng nhập</h2>
-    <form id="login-form">
+    <form id="login-form" onsubmit="login(event)">
       <div class="form-group">
         <label>Tên người dùng</label>
         <input type="text" id="login-username" required>
@@ -76,15 +192,15 @@
       </div>
       <button type="submit">Đăng nhập</button>
     </form>
-    <p>Chưa có tài khoản? <a href="#" id="to-register">Đăng ký</a></p>
+    <p>Chưa có tài khoản? <a href="#" onclick="showSection('register')">Đăng ký</a></p>
   </div>
 
   <!-- Tài khoản -->
-  <div id="account-section" class="form-container hidden">
+  <div id="account-section" class="form-container">
     <h2>Quản lý tài khoản</h2>
     <div class="form-group">
       <h3>Avatar</h3>
-      <img id="user-avatar" class="avatar" alt="Avatar người dùng">
+      <img id="user-avatar" class="avatar" alt="Avatar người dùng" style="width: 100px;">
       <p>Avatar không thể thay đổi.</p>
     </div>
     <div class="form-group">
@@ -100,99 +216,34 @@
     </div>
     <div class="form-group">
       <h3>Xóa tài khoản</h3>
-      <button onclick="deleteAccount()" class="delete-btn">Xóa tài khoản</button>
+      <button onclick="deleteAccount()">Xóa tài khoản</button>
     </div>
-    <button id="back-account" class="back-btn" onclick="navigateToHome()">Quay lại</button>
-  </div>
-
-  <!-- Lựa chọn nội dung (người dùng thường) -->
-  <div id="options-section" class="form-container hidden">
-    <h2>Chọn nội dung</h2>
-    <div class="options">
-      <button id="client-vng">Client VNG</button>
-      <button id="client-international">Client Quốc tế</button>
-      <button id="script">Script</button>
-    </div>
-    <button id="back-options" class="back-btn" onclick="navigateToHome()">Quay lại</button>
-  </div>
-
-  <!-- Hiển thị file Client VNG -->
-  <div id="vng-section" class="form-container hidden">
-    <h2>Danh sách file Client VNG</h2>
-    <ul id="vng-files-user" class="file-list"></ul>
-    <button id="back-vng" class="back-btn" onclick="goBack('options')">Quay lại</button>
-  </div>
-
-  <!-- Hiển thị file Client Quốc tế -->
-  <div id="international-section" class="form-container hidden">
-    <h2>Danh sách file Client Quốc tế</h2>
-    <ul id="international-files-user" class="file-list"></ul>
-    <button id="back-international" class="back-btn" onclick="goBack('options')">Quay lại</button>
-  </div>
-
-  <!-- Hiển thị Script và Hình ảnh -->
-  <div id="script-section" class="form-container hidden">
-    <h2>Danh sách Script</h2>
-    <ul id="script-list-user" class="file-list"></ul>
-    <h2>Danh sách Hình ảnh</h2>
-    <ul id="image-list-user" class="file-list"></ul>
-    <button id="back-script" class="back-btn" onclick="goBack('options')">Quay lại</button>
+    <button onclick="showSection('home')">Quay lại</button>
   </div>
 
   <!-- Giao diện admin -->
-  <div id="admin-section" class="form-container hidden">
+  <div id="admin-section" class="form-container">
     <h2>Quản lý Admin</h2>
     <div class="form-group">
       <h3>Avatar Admin</h3>
-      <img id="admin-avatar" class="avatar" alt="Avatar Admin">
+      <img id="admin-avatar" class="avatar" alt="Avatar Admin" style="width: 100px;">
       <p>Avatar không thể thay đổi.</p>
     </div>
-    <div class="admin-options">
-      <!-- Thêm file cho Client VNG -->
-      <div class="form-group">
-        <h3>Thêm file cho Client VNG</h3>
-        <input type="text" id="vng-file-name" placeholder="Tên file">
-        <input type="text" id="vng-file-url" placeholder="Link URL">
-        <button onclick="addFile('vng')">Thêm File</button>
-        <ul id="vng-files" class="file-list"></ul>
-      </div>
-      <!-- Thêm file cho Client Quốc tế -->
-      <div class="form-group">
-        <h3>Thêm file cho Client Quốc tế</h3>
-        <input type="text" id="international-file-name" placeholder="Tên file">
-        <input type="text" id="international-file-url" placeholder="Link URL">
-        <button onclick="addFile('international')">Thêm File</button>
-        <ul id="international-files" class="file-list"></ul>
-      </div>
-      <!-- Thêm Script -->
-      <div class="form-group">
-        <h3>Thêm Script</h3>
-        <input type="text" id="script-name" placeholder="Tên script">
-        <textarea id="script-text" placeholder="Nội dung script"></textarea>
-        <button onclick="addScript()">Thêm Script</button>
-        <ul id="script-list" class="file-list"></ul>
-      </div>
-      <!-- Thêm Hình ảnh -->
-      <div class="form-group">
-        <h3>Thêm Hình ảnh</h3>
-        <input type="text" id="image-name" placeholder="Tên hoặc URL hình ảnh">
-        <button onclick="addImage()">Thêm Hình</button>
-        <ul id="image-list" class="file-list"></ul>
-      </div>
-      <!-- Thêm liên kết mạng xã hội -->
-      <div class="form-group">
-        <h3>Thêm Liên kết Mạng Xã Hội</h3>
-        <input type="text" id="facebook-url" placeholder="Link Facebook">
-        <button onclick="addSocialLink('facebook')">Thêm Facebook</button>
-        <input type="text" id="zalo-url" placeholder="Link Zalo">
-        <button onclick="addSocialLink('zalo')">Thêm Zalo</button>
-        <input type="text" id="tiktok-url" placeholder="Link TikTok">
-        <button onclick="addSocialLink('tiktok')">Thêm TikTok</button>
-        <input type="text" id="youtube-url" placeholder="Link Youtube">
-        <button onclick="addSocialLink('youtube')">Thêm Youtube</button>
-      </div>
+    <div class="form-group">
+      <h3>Thêm file cho Client VNG</h3>
+      <input type="text" id="vng-file-name" placeholder="Tên file">
+      <input type="text" id="vng-file-url" placeholder="Link URL">
+      <button onclick="addFile('vng')">Thêm File</button>
+      <ul id="vng-files" class="file-list"></ul>
     </div>
-    <button id="admin-back" class="back-btn" onclick="navigateToHome()">Quay lại</button>
+    <div class="form-group">
+      <h3>Thêm file cho Client Quốc tế</h3>
+      <input type="text" id="international-file-name" placeholder="Tên file">
+      <input type="text" id="international-file-url" placeholder="Link URL">
+      <button onclick="addFile('international')">Thêm File</button>
+      <ul id="international-files" class="file-list"></ul>
+    </div>
+    <button onclick="showSection('home')">Quay lại</button>
   </div>
 
   <script>
@@ -202,36 +253,23 @@
       password: 'hungdeptrai345@', 
       role: 'admin', 
       gmail: '',
-      avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' // Avatar admin
+      avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
     };
     if (!localStorage.getItem('users')) {
       localStorage.setItem('users', JSON.stringify([defaultAdmin]));
     }
 
-    // Khởi tạo danh sách file, script, hình ảnh, và liên kết mạng xã hội
+    let currentUser = null;
     let vngFiles = JSON.parse(localStorage.getItem('vngFiles')) || [];
     let internationalFiles = JSON.parse(localStorage.getItem('internationalFiles')) || [];
-    let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
-    let images = JSON.parse(localStorage.getItem('images')) || [];
-    let socialLinks = JSON.parse(localStorage.getItem('socialLinks')) || {
-      facebook: '',
-      zalo: '',
-      tiktok: '',
-      youtube: ''
-    };
-    let currentUser = null;
+    let socialLinks = { facebook: '', zalo: '', tiktok: '', youtube: '' };
 
-    // Chuyển đổi giữa các section
     const sections = {
       home: document.getElementById('home-section'),
       register: document.getElementById('register-section'),
       login: document.getElementById('login-section'),
       account: document.getElementById('account-section'),
-      options: document.getElementById('options-section'),
-      admin: document.getElementById('admin-section'),
-      vng: document.getElementById('vng-section'),
-      international: document.getElementById('international-section'),
-      script: document.getElementById('script-section')
+      admin: document.getElementById('admin-section')
     };
     const hamburger = document.getElementById('hamburger');
     const loginPrompt = document.getElementById('login-prompt');
@@ -239,91 +277,46 @@
     const socialLinksSection = document.getElementById('social-links');
     const sidebar = document.getElementById('sidebar');
 
-    // Hiển thị/ẩn các phần dựa trên trạng thái đăng nhập
     function updateLoginState() {
       if (!currentUser) {
         hamburger.classList.add('hidden');
         loginPrompt.classList.remove('hidden');
         authButtons.classList.remove('hidden');
         socialLinksSection.classList.add('hidden');
-        Object.values(sections).forEach(sec => sec.classList.add('hidden'));
-        sections.home.classList.remove('hidden');
       } else {
         hamburger.classList.remove('hidden');
         loginPrompt.classList.add('hidden');
         authButtons.classList.add('hidden');
         socialLinksSection.classList.remove('hidden');
-        if (sections.admin.classList.contains('hidden') === false && currentUser.role !== 'admin') {
-          sections.admin.classList.add('hidden');
-        }
-        Object.values(sections).forEach(sec => {
-          if (sec !== sections.home) sec.classList.add('hidden');
-        });
-        sections.home.classList.remove('hidden');
       }
-      setTimeout(() => {
-        sections.home.style.display = 'block';
-      }, 0);
+      Object.values(sections).forEach(sec => sec.classList.remove('active'));
+      sections.home.classList.add('active');
     }
 
-    // Mở/đóng sidebar
-    window.toggleMenu = function() {
-      if (currentUser) {
-        sidebar.classList.toggle('open');
-      }
+    window.showSection = function(section) {
+      Object.values(sections).forEach(sec => sec.classList.remove('active'));
+      sections[section].classList.add('active');
+      sidebar.classList.remove('open');
+      updateLoginState();
     };
 
-    // Điều hướng
+    window.toggleMenu = function() {
+      sidebar.classList.toggle('open');
+    };
+
     window.navigate = function(section) {
       if (!currentUser) return;
-      toggleMenu();
-      Object.values(sections).forEach(sec => sec.classList.add('hidden'));
       if (section === 'admin' && currentUser.role !== 'admin') {
         alert('Chỉ admin mới có quyền truy cập!');
-        sections.home.classList.remove('hidden');
-      } else {
-        sections[section].classList.remove('hidden');
-        if (section === 'admin') loadAdminData();
-        if (section === 'account') loadAccountData();
-        if (section === 'content') sections.options.classList.remove('hidden');
+        return;
       }
-      updateLoginState();
+      showSection(section);
+      if (section === 'account') loadAccountData();
+      if (section === 'admin') loadAdminData();
     };
 
-    // Điều hướng về trang chủ
-    window.navigateToHome = function() {
-      Object.values(sections).forEach(sec => sec.classList.add('hidden'));
-      sections.home.classList.remove('hidden');
-      updateLoginState();
-    };
-
-    // Quay lại section trước
-    window.goBack = function(target) {
-      Object.values(sections).forEach(sec => sec.classList.add('hidden'));
-      sections[target].classList.remove('hidden');
-    };
-
-    // Sự kiện chuyển đổi giữa đăng ký và đăng nhập
-    document.getElementById('to-login').addEventListener('click', () => {
-      sections.register.classList.add('hidden');
-      sections.login.classList.remove('hidden');
-    });
-    document.getElementById('to-register').addEventListener('click', () => {
-      sections.login.classList.add('hidden');
-      sections.register.classList.remove('hidden');
-    });
-    document.getElementById('to-register-btn').addEventListener('click', () => {
-      sections.home.classList.add('hidden');
-      sections.register.classList.remove('hidden');
-    });
-    document.getElementById('to-login-btn').addEventListener('click', () => {
-      sections.home.classList.add('hidden');
-      sections.login.classList.remove('hidden');
-    });
-
-    // Xử lý đăng ký
-    document.getElementById('register-form').addEventListener('submit', (e) => {
-      e.preventDefault();
+    window.register = function(event) {
+      event.preventDefault();
       const username = document.getElementById('reg-username').value;
       const password = document.getElementById('reg-password').value;
       let users = JSON.parse(localStorage.getItem('users')) || [];
@@ -334,27 +327,24 @@
       users.push({ username, password, role: 'user', gmail: '', avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' });
       localStorage.setItem('users', JSON.stringify(users));
       alert('Đăng ký thành công!');
-      sections.register.classList.add('hidden');
-      sections.login.classList.remove('hidden');
-    });
+      showSection('login');
+    };
 
-    // Xử lý đăng nhập
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault();
+    window.login = function(event) {
+      event.preventDefault();
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
       const users = JSON.parse(localStorage.getItem('users')) || [];
       const user = users.find(u => u.username === username && u.password === password);
       if (user) {
         currentUser = user;
-        sections.login.classList.add('hidden');
-        navigateToHome();
+        showSection('home');
+        updateLoginState();
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
-    });
+    };
 
-    // Xử lý tài khoản
     window.changePassword = function() {
       const newPassword = document.getElementById('new-password').value;
       if (!newPassword) {
@@ -392,35 +382,10 @@
       users = users.filter(u => u.username !== currentUser.username);
       localStorage.setItem('users', JSON.stringify(users));
       currentUser = null;
-      sections.account.classList.add('hidden');
-      navigateToHome();
+      showSection('home');
+      updateLoginState();
     };
 
-    function loadAccountData() {
-      const gmailDisplay = document.getElementById('gmail-display');
-      gmailDisplay.textContent = currentUser.gmail ? `Gmail hiện tại: ${currentUser.gmail}` : 'Chưa có Gmail.';
-      const userAvatar = document.getElementById('user-avatar');
-      userAvatar.src = currentUser.avatar;
-    }
-
-    // Xử lý lựa chọn nội dung
-    document.getElementById('client-vng').addEventListener('click', () => {
-      sections.options.classList.add('hidden');
-      sections.vng.classList.remove('hidden');
-      loadUserData('vng');
-    });
-    document.getElementById('client-international').addEventListener('click', () => {
-      sections.options.classList.add('hidden');
-      sections.international.classList.remove('hidden');
-      loadUserData('international');
-    });
-    document.getElementById('script').addEventListener('click', () => {
-      sections.options.classList.add('hidden');
-      sections.script.classList.remove('hidden');
-      loadUserData('script');
-    });
-
-    // Hàm thêm file
     window.addFile = function(type) {
       const fileName = document.getElementById(`${type}-file-name`).value;
       const fileUrl = document.getElementById(`${type}-file-url`).value;
@@ -441,165 +406,32 @@
       loadAdminData();
     };
 
-    // Hàm thêm script
-    window.addScript = function() {
-      const scriptName = document.getElementById('script-name').value;
-      const scriptText = document.getElementById('script-text').value;
-      if (!scriptName || !scriptText) {
-        alert('Vui lòng nhập tên và nội dung script!');
-        return;
-      }
-      scripts.push({ name: scriptName, content: scriptText });
-      localStorage.setItem('scripts', JSON.stringify(scripts));
-      document.getElementById('script-name').value = '';
-      document.getElementById('script-text').value = '';
-      loadAdminData();
-    };
-
-    // Hàm thêm hình ảnh
-    window.addImage = function() {
-      const imageName = document.getElementById('image-name').value;
-      if (!imageName) {
-        alert('Vui lòng nhập tên hoặc URL hình ảnh!');
-        return;
-      }
-      images.push(imageName);
-      localStorage.setItem('images', JSON.stringify(images));
-      document.getElementById('image-name').value = '';
-      loadAdminData();
-    };
-
-    // Hàm xóa file
-    window.deleteFile = function(type, index) {
-      if (type === 'vng') {
-        vngFiles.splice(index, 1);
-        localStorage.setItem('vngFiles', JSON.stringify(vngFiles));
-      } else if (type === 'international') {
-        internationalFiles.splice(index, 1);
-        localStorage.setItem('internationalFiles', JSON.stringify(internationalFiles));
-      }
-      loadAdminData();
-    };
-
-    // Hàm xóa script
-    window.deleteScript = function(index) {
-      scripts.splice(index, 1);
-      localStorage.setItem('scripts', JSON.stringify(scripts));
-      loadAdminData();
-    };
-
-    // Hàm xóa hình ảnh
-    window.deleteImage = function(index) {
-      images.splice(index, 1);
-      localStorage.setItem('images', JSON.stringify(images));
-      loadAdminData();
-    };
-
-    // Hàm thêm liên kết mạng xã hội
-    window.addSocialLink = function(platform) {
-      const url = document.getElementById(`${platform}-url`).value;
-      if (!url) {
-        alert(`Vui lòng nhập link ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`);
-        return;
-      }
-      socialLinks[platform] = url;
-      localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
-      alert(`Thêm link ${platform.charAt(0).toUpperCase() + platform.slice(1)} thành công!`);
-      document.getElementById(`${platform}-url`).value = '';
-      updateSocialLinks();
-    };
-
-    // Hàm mở liên kết mạng xã hội
     window.openSocialLink = function(platform) {
       const url = socialLinks[platform];
       if (url) {
         window.open(url, '_blank');
       } else {
-        alert('Chủ Trang Chưa Thêm');
+        alert('Chưa có liên kết!');
       }
     };
 
-    // Hàm cập nhật liên kết mạng xã hội
-    function updateSocialLinks() {
-      document.getElementById('facebook-link').href = socialLinks.facebook || '#';
-      document.getElementById('zalo-link').href = socialLinks.zalo || '#';
-      document.getElementById('tiktok-link').href = socialLinks.tiktok || '#';
-      document.getElementById('youtube-link').href = socialLinks.youtube || '#';
+    function loadAccountData() {
+      const gmailDisplay = document.getElementById('gmail-display');
+      gmailDisplay.textContent = currentUser.gmail ? `Gmail hiện tại: ${currentUser.gmail}` : 'Chưa có Gmail.';
+      const userAvatar = document.getElementById('user-avatar');
+      userAvatar.src = currentUser.avatar;
     }
 
-    // Hàm tải dữ liệu admin
     function loadAdminData() {
       const adminAvatar = document.getElementById('admin-avatar');
       adminAvatar.src = currentUser.avatar;
       const vngList = document.getElementById('vng-files');
-      vngList.innerHTML = vngFiles.map((file, index) => `
-        <li>
-          <span>${file.name}</span>
-          ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
-          <button class="delete-btn" onclick="deleteFile('vng', ${index})">Xóa</button>
-        </li>
-      `).join('');
+      vngList.innerHTML = vngFiles.map(file => `<li>${file.name} ${file.url ? `<a href="${file.url}" target="_blank">Tải xuống</a>` : ''}</li>`).join('');
       const internationalList = document.getElementById('international-files');
-      internationalList.innerHTML = internationalFiles.map((file, index) => `
-        <li>
-          <span>${file.name}</span>
-          ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
-          <button class="delete-btn" onclick="deleteFile('international', ${index})">Xóa</button>
-        </li>
-      `).join('');
-      const scriptList = document.getElementById('script-list');
-      scriptList.innerHTML = scripts.map((script, index) => `
-        <li>
-          <strong>${script.name}</strong>: ${script.content}
-          <button class="delete-btn" onclick="deleteScript(${index})">Xóa</button>
-        </li>
-      `).join('');
-      const imageList = document.getElementById('image-list');
-      imageList.innerHTML = images.map((image, index) => `
-        <li>
-          ${image}
-          <button class="delete-btn" onclick="deleteImage(${index})">Xóa</button>
-        </li>
-      `).join('');
+      internationalList.innerHTML = internationalFiles.map(file => `<li>${file.name} ${file.url ? `<a href="${file.url}" target="_blank">Tải xuống</a>` : ''}</li>`).join('');
     }
 
-    // Hàm tải dữ liệu cho người dùng thường
-    function loadUserData(type) {
-      if (type === 'vng') {
-        const vngList = document.getElementById('vng-files-user');
-        vngList.innerHTML = vngFiles.length > 0
-          ? vngFiles.map(file => `
-              <li>
-                <span>${file.name}</span>
-                ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
-              </li>
-            `).join('')
-          : '<li>Chưa có file nào.</li>';
-      } else if (type === 'international') {
-        const internationalList = document.getElementById('international-files-user');
-        internationalList.innerHTML = internationalFiles.length > 0
-          ? internationalFiles.map(file => `
-              <li>
-                <span>${file.name}</span>
-                ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
-              </li>
-            `).join('')
-          : '<li>Chưa có file nào.</li>';
-      } else if (type === 'script') {
-        const scriptList = document.getElementById('script-list-user');
-        scriptList.innerHTML = scripts.length > 0
-          ? scripts.map(script => `<li><strong>${script.name}</strong>: ${script.content}</li>`).join('')
-          : '<li>Chưa có script nào.</li>';
-        const imageList = document.getElementById('image-list-user');
-        imageList.innerHTML = images.length > 0
-          ? images.map(image => `<li>${image}</li>`).join('')
-          : '<li>Chưa có hình ảnh nào.</li>';
-      }
-    }
-
-    // Khởi tạo trạng thái ban đầu
     updateLoginState();
-    updateSocialLinks();
   </script>
 </body>
-              </html>
+  </html>
