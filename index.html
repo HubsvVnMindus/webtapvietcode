@@ -350,7 +350,7 @@
         currentUser = user;
         loginSection.classList.add('hidden');
         homeSection.classList.remove('hidden');
-        updateLoginState();
+        updateLoginState(); // Cập nhật trạng thái sau khi đăng nhập
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -397,7 +397,7 @@
       alert('Xóa tài khoản thành công!');
       accountSection.classList.add('hidden');
       homeSection.classList.remove('hidden');
-      updateLoginState();
+      updateLoginState(); // Cập nhật trạng thái sau khi xóa tài khoản
     };
 
     function loadAccountData() {
