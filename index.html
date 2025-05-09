@@ -9,12 +9,25 @@
 <body>
   <!-- Trang chủ -->
   <div id="home-section" class="form-container">
-    <h2>Chào mừng đến với hệ thống</h2>
-    <div class="options">
-      <button id="to-content">Xem nội dung</button>
-      <button id="to-account">Tài khoản</button>
-      <button id="to-admin">Admin</button>
+    <div class="hamburger" onclick="toggleMenu()">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
     </div>
+    <h2>Chào mừng đến với menu</h2>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h3>Menu</h3>
+      <span class="close-btn" onclick="toggleMenu()">×</span>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" onclick="navigate('content')">Trang Chủ</a></li>
+      <li><a href="#" onclick="navigate('account')">Tài khoản</a></li>
+      <li><a href="#" onclick="navigate('admin')">Quản lý</a></li>
+    </ul>
   </div>
 
   <!-- Đăng ký -->
@@ -74,7 +87,7 @@
 
   <!-- Lựa chọn nội dung (người dùng thường) -->
   <div id="options-section" class="form-container hidden">
-    <h2>Chọn nội dung</h2>
+    <h2>Chọn</h2>
     <div class="options">
       <button id="client-vng">Client VNG</button>
       <button id="client-international">Client Quốc tế</button>
@@ -169,41 +182,46 @@
     const vngSection = document.getElementById('vng-section');
     const internationalSection = document.getElementById('international-section');
     const scriptSection = document.getElementById('script-section');
+    const sidebar = document.getElementById('sidebar');
 
-    // Xử lý trang chủ
-    document.getElementById('to-content').addEventListener('click', () => {
-      if (!currentUser) {
-        homeSection.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-      } else {
-        homeSection.classList.add('hidden');
-        optionsSection.classList.remove('hidden');
-      }
-    });
+    // Mở/đóng sidebar
+    window.toggleMenu = function() {
+      sidebar.classList.toggle('open');
+    };
 
-    document.getElementById('to-account').addEventListener('click', () => {
-      if (!currentUser) {
-        homeSection.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-      } else {
-        homeSection.classList.add('hidden');
-        accountSection.classList.remove('hidden');
-        loadAccountData();
+    // Điều hướng từ sidebar
+    window.navigate = function(section) {
+      toggleMenu();
+      if (section === 'content') {
+        if (!currentUser) {
+          homeSection.classList.add('hidden');
+          loginSection.classList.remove('hidden');
+        } else {
+          homeSection.classList.add('hidden');
+          optionsSection.classList.remove('hidden');
+        }
+      } else if (section === 'account') {
+        if (!currentUser) {
+          homeSection.classList.add('hidden');
+          loginSection.classList.remove('hidden');
+        } else {
+          homeSection.classList.add('hidden');
+          accountSection.classList.remove('hidden');
+          loadAccountData();
+        }
+      } else if (section === 'admin') {
+        if (!currentUser) {
+          homeSection.classList.add('hidden');
+          loginSection.classList.remove('hidden');
+        } else if (currentUser.role === 'admin') {
+          homeSection.classList.add('hidden');
+          adminSection.classList.remove('hidden');
+          loadAdminData();
+        } else {
+          alert('Chỉ admin mới có quyền truy cập!');
+        }
       }
-    });
-
-    document.getElementById('to-admin').addEventListener('click', () => {
-      if (!currentUser) {
-        homeSection.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-      } else if (currentUser.role === 'admin') {
-        homeSection.classList.add('hidden');
-        adminSection.classList.remove('hidden');
-        loadAdminData();
-      } else {
-        alert('Chỉ admin mới có quyền truy cập!');
-      }
-    });
+    };
 
     document.getElementById('to-login').addEventListener('click', () => {
       registerSection.classList.add('hidden');
@@ -489,4 +507,4 @@
     }
   </script>
 </body>
-  </html>
+        </html>
