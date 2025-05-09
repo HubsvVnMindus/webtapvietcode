@@ -52,6 +52,29 @@
     <button id="logout" class="logout">Đăng xuất</button>
   </div>
 
+  <!-- Hiển thị file Client VNG -->
+  <div id="vng-section" class="form-container hidden">
+    <h2>Danh sách file Client VNG</h2>
+    <ul id="vng-files-user" class="file-list"></ul>
+    <button id="back-vng" class="back-btn">Quay lại</button>
+  </div>
+
+  <!-- Hiển thị file Client Quốc tế -->
+  <div id="international-section" class="form-container hidden">
+    <h2>Danh sách file Client Quốc tế</h2>
+    <ul id="international-files-user" class="file-list"></ul>
+    <button id="back-international" class="back-btn">Quay lại</button>
+  </div>
+
+  <!-- Hiển thị Script và Hình ảnh -->
+  <div id="script-section" class="form-container hidden">
+    <h2>Danh sách Script</h2>
+    <ul id="script-list-user" class="file-list"></ul>
+    <h2>Danh sách Hình ảnh</h2>
+    <ul id="image-list-user" class="file-list"></ul>
+    <button id="back-script" class="back-btn">Quay lại</button>
+  </div>
+
   <!-- Giao diện admin -->
   <div id="admin-section" class="form-container hidden">
     <h2>Quản lý Admin</h2>
@@ -60,6 +83,7 @@
       <div class="form-group">
         <h3>Thêm file cho Client VNG</h3>
         <input type="text" id="vng-file-name" placeholder="Tên file">
+        <input type="text" id="vng-file-url" placeholder="Link URL">
         <button onclick="addFile('vng')">Thêm File</button>
         <ul id="vng-files" class="file-list"></ul>
       </div>
@@ -67,6 +91,7 @@
       <div class="form-group">
         <h3>Thêm file cho Client Quốc tế</h3>
         <input type="text" id="international-file-name" placeholder="Tên file">
+        <input type="text" id="international-file-url" placeholder="Link URL">
         <button onclick="addFile('international')">Thêm File</button>
         <ul id="international-files" class="file-list"></ul>
       </div>
@@ -95,7 +120,7 @@
       localStorage.setItem('users', JSON.stringify([defaultAdmin]));
     }
 
-    // Khởi tạo danh sách file và script
+    // Khởi tạo danh sách file, script, và hình ảnh
     let vngFiles = JSON.parse(localStorage.getItem('vngFiles')) || [];
     let internationalFiles = JSON.parse(localStorage.getItem('internationalFiles')) || [];
     let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
@@ -106,6 +131,9 @@
     const loginSection = document.getElementById('login-section');
     const optionsSection = document.getElementById('options-section');
     const adminSection = document.getElementById('admin-section');
+    const vngSection = document.getElementById('vng-section');
+    const internationalSection = document.getElementById('international-section');
+    const scriptSection = document.getElementById('script-section');
 
     document.getElementById('to-login').addEventListener('click', () => {
       registerSection.classList.add('hidden');
@@ -168,32 +196,57 @@
 
     // Xử lý các lựa chọn (người dùng thường)
     document.getElementById('client-vng').addEventListener('click', () => {
-      alert('Đã chọn Client VNG');
+      optionsSection.classList.add('hidden');
+      vngSection.classList.remove('hidden');
+      loadUserData('vng');
     });
 
     document.getElementById('client-international').addEventListener('click', () => {
-      alert('Đã chọn Client Quốc tế');
+      optionsSection.classList.add('hidden');
+      internationalSection.classList.remove('hidden');
+      loadUserData('international');
     });
 
     document.getElementById('script').addEventListener('click', () => {
-      alert('Đã chọn Script');
+      optionsSection.classList.add('hidden');
+      scriptSection.classList.remove('hidden');
+      loadUserData('script');
+    });
+
+    // Xử lý nút quay lại
+    document.getElementById('back-vng').addEventListener('click', () => {
+      vngSection.classList.add('hidden');
+      optionsSection.classList.remove('hidden');
+    });
+
+    document.getElementById('back-international').addEventListener('click', () => {
+      internationalSection.classList.add('hidden');
+      optionsSection.classList.remove('hidden');
+    });
+
+    document.getElementById('back-script').addEventListener('click', () => {
+      scriptSection.classList.add('hidden');
+      optionsSection.classList.remove('hidden');
     });
 
     // Hàm thêm file
     window.addFile = function(type) {
       const fileName = document.getElementById(`${type}-file-name`).value;
+      const fileUrl = document.getElementById(`${type}-file-url`).value;
       if (!fileName) {
         alert('Vui lòng nhập tên file!');
         return;
       }
+      const fileData = { name: fileName, url: fileUrl || '' };
       if (type === 'vng') {
-        vngFiles.push(fileName);
+        vngFiles.push(fileData);
         localStorage.setItem('vngFiles', JSON.stringify(vngFiles));
       } else {
-        internationalFiles.push(fileName);
+        internationalFiles.push(fileData);
         localStorage.setItem('internationalFiles', JSON.stringify(internationalFiles));
       }
       document.getElementById(`${type}-file-name`).value = '';
+      document.getElementById(`${type}-file-url`).value = '';
       loadAdminData();
     };
 
@@ -223,24 +276,102 @@
       loadAdminData();
     };
 
+    // Hàm xóa file
+    window.deleteFile = function(type, index) {
+      if (type === 'vng') {
+        vngFiles.splice(index, 1);
+        localStorage.setItem('vngFiles', JSON.stringify(vngFiles));
+      } else if (type === 'international') {
+        internationalFiles.splice(index, 1);
+        localStorage.setItem('internationalFiles', JSON.stringify(internationalFiles));
+      }
+      loadAdminData();
+    };
+
+    // Hàm xóa script
+    window.deleteScript = function(index) {
+      scripts.splice(index, 1);
+      localStorage.setItem('scripts', JSON.stringify(scripts));
+      loadAdminData();
+    };
+
+    // Hàm xóa hình ảnh
+    window.deleteImage = function(index) {
+      images.splice(index, 1);
+      localStorage.setItem('images', JSON.stringify(images));
+      loadAdminData();
+    };
+
     // Hàm tải dữ liệu admin
     function loadAdminData() {
       // Hiển thị file Client VNG
       const vngList = document.getElementById('vng-files');
-      vngList.innerHTML = vngFiles.map(file => `<li>${file}</li>`).join('');
+      vngList.innerHTML = vngFiles.map((file, index) => `
+        <li>
+          ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+          <button class="delete-btn" onclick="deleteFile('vng', ${index})">Xóa</button>
+        </li>
+      `).join('');
 
       // Hiển thị file Client Quốc tế
       const internationalList = document.getElementById('international-files');
-      internationalList.innerHTML = internationalFiles.map(file => `<li>${file}</li>`).join('');
+      internationalList.innerHTML = internationalFiles.map((file, index) => `
+        <li>
+          ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+          <button class="delete-btn" onclick="deleteFile('international', ${index})">Xóa</button>
+        </li>
+      `).join('');
 
       // Hiển thị script
       const scriptList = document.getElementById('script-list');
-      scriptList.innerHTML = scripts.map(script => `<li>${script}</li>`).join('');
+      scriptList.innerHTML = scripts.map((script, index) => `
+        <li>
+          ${script}
+          <button class="delete-btn" onclick="deleteScript(${index})">Xóa</button>
+        </li>
+      `).join('');
 
       // Hiển thị hình ảnh
       const imageList = document.getElementById('image-list');
-      imageList.innerHTML = images.map(image => `<li>${image}</li>`).join('');
+      imageList.innerHTML = images.map((image, index) => `
+        <li>
+          ${image}
+          <button class="delete-btn" onclick="deleteImage(${index})">Xóa</button>
+        </li>
+      `).join('');
+    }
+
+    // Hàm tải dữ liệu cho người dùng thường
+    function loadUserData(type) {
+      if (type === 'vng') {
+        const vngList = document.getElementById('vng-files-user');
+        vngList.innerHTML = vngFiles.length > 0
+          ? vngFiles.map(file => `
+              <li>
+                ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+              </li>
+            `).join('')
+          : '<li>Chưa có file nào.</li>';
+      } else if (type === 'international') {
+        const internationalList = document.getElementById('international-files-user');
+        internationalList.innerHTML = internationalFiles.length > 0
+          ? internationalFiles.map(file => `
+              <li>
+                ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+              </li>
+            `).join('')
+          : '<li>Chưa có file nào.</li>';
+      } else if (type === 'script') {
+        const scriptList = document.getElementById('script-list-user');
+        scriptList.innerHTML = scripts.length > 0
+          ? scripts.map(script => `<li>${script}</li>`).join('')
+          : '<li>Chưa có script nào.</li>';
+        const imageList = document.getElementById('image-list-user');
+        imageList.innerHTML = images.length > 0
+          ? images.map(image => `<li>${image}</li>`).join('')
+          : '<li>Chưa có hình ảnh nào.</li>';
+      }
     }
   </script>
 </body>
-  </html>
+    </html>
