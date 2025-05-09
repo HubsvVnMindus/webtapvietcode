@@ -10,9 +10,6 @@
       margin: 0;
       padding: 0;
       background-color: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
     }
     .form-container {
@@ -22,6 +19,7 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 400px;
+      margin: 20px auto;
       display: none;
     }
     .form-container.active {
@@ -68,6 +66,25 @@
       padding: 10px;
       text-decoration: none;
       color: #1a73e8;
+    }
+    .file-list {
+      list-style: none;
+      padding: 0;
+    }
+    .file-list li {
+      margin: 5px 0;
+    }
+    .delete-btn, .download-btn {
+      padding: 5px 10px;
+      margin-left: 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .download-btn {
+      background-color: #28a745;
     }
     .hamburger {
       position: fixed;
@@ -221,6 +238,40 @@
     <button onclick="showSection('home')">Quay lại</button>
   </div>
 
+  <!-- Lựa chọn nội dung (người dùng thường) -->
+  <div id="options-section" class="form-container">
+    <h2>Chọn nội dung</h2>
+    <div class="options">
+      <button onclick="showSection('vng')">Client VNG</button>
+      <button onclick="showSection('international')">Client Quốc tế</button>
+      <button onclick="showSection('script')">Script</button>
+    </div>
+    <button onclick="showSection('home')">Quay lại</button>
+  </div>
+
+  <!-- Hiển thị file Client VNG -->
+  <div id="vng-section" class="form-container">
+    <h2>Danh sách file Client VNG</h2>
+    <ul id="vng-files-user" class="file-list"></ul>
+    <button onclick="showSection('options')">Quay lại</button>
+  </div>
+
+  <!-- Hiển thị file Client Quốc tế -->
+  <div id="international-section" class="form-container">
+    <h2>Danh sách file Client Quốc tế</h2>
+    <ul id="international-files-user" class="file-list"></ul>
+    <button onclick="showSection('options')">Quay lại</button>
+  </div>
+
+  <!-- Hiển thị Script và Hình ảnh -->
+  <div id="script-section" class="form-container">
+    <h2>Danh sách Script</h2>
+    <ul id="script-list-user" class="file-list"></ul>
+    <h2>Danh sách Hình ảnh</h2>
+    <ul id="image-list-user" class="file-list"></ul>
+    <button onclick="showSection('options')">Quay lại</button>
+  </div>
+
   <!-- Giao diện admin -->
   <div id="admin-section" class="form-container">
     <h2>Quản lý Admin</h2>
@@ -243,6 +294,30 @@
       <button onclick="addFile('international')">Thêm File</button>
       <ul id="international-files" class="file-list"></ul>
     </div>
+    <div class="form-group">
+      <h3>Thêm Script</h3>
+      <input type="text" id="script-name" placeholder="Tên script">
+      <textarea id="script-text" placeholder="Nội dung script"></textarea>
+      <button onclick="addScript()">Thêm Script</button>
+      <ul id="script-list" class="file-list"></ul>
+    </div>
+    <div class="form-group">
+      <h3>Thêm Hình ảnh</h3>
+      <input type="text" id="image-name" placeholder="Tên hoặc URL hình ảnh">
+      <button onclick="addImage()">Thêm Hình</button>
+      <ul id="image-list" class="file-list"></ul>
+    </div>
+    <div class="form-group">
+      <h3>Thêm Liên kết Mạng Xã Hội</h3>
+      <input type="text" id="facebook-url" placeholder="Link Facebook">
+      <button onclick="addSocialLink('facebook')">Thêm Facebook</button>
+      <input type="text" id="zalo-url" placeholder="Link Zalo">
+      <button onclick="addSocialLink('zalo')">Thêm Zalo</button>
+      <input type="text" id="tiktok-url" placeholder="Link TikTok">
+      <button onclick="addSocialLink('tiktok')">Thêm TikTok</button>
+      <input type="text" id="youtube-url" placeholder="Link Youtube">
+      <button onclick="addSocialLink('youtube')">Thêm Youtube</button>
+    </div>
     <button onclick="showSection('home')">Quay lại</button>
   </div>
 
@@ -262,13 +337,19 @@
     let currentUser = null;
     let vngFiles = JSON.parse(localStorage.getItem('vngFiles')) || [];
     let internationalFiles = JSON.parse(localStorage.getItem('internationalFiles')) || [];
-    let socialLinks = { facebook: '', zalo: '', tiktok: '', youtube: '' };
+    let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+    let images = JSON.parse(localStorage.getItem('images')) || [];
+    let socialLinks = JSON.parse(localStorage.getItem('socialLinks')) || { facebook: '', zalo: '', tiktok: '', youtube: '' };
 
     const sections = {
       home: document.getElementById('home-section'),
       register: document.getElementById('register-section'),
       login: document.getElementById('login-section'),
       account: document.getElementById('account-section'),
+      options: document.getElementById('options-section'),
+      vng: document.getElementById('vng-section'),
+      international: document.getElementById('international-section'),
+      script: document.getElementById('script-section'),
       admin: document.getElementById('admin-section')
     };
     const hamburger = document.getElementById('hamburger');
@@ -276,6 +357,13 @@
     const authButtons = document.getElementById('auth-buttons');
     const socialLinksSection = document.getElementById('social-links');
     const sidebar = document.getElementById('sidebar');
+
+    // Đảm bảo hiển thị mặc định nếu JavaScript lỗi
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!sections.home.classList.contains('active')) {
+        sections.home.classList.add('active');
+      }
+    });
 
     function updateLoginState() {
       if (!currentUser) {
@@ -289,14 +377,22 @@
         authButtons.classList.add('hidden');
         socialLinksSection.classList.remove('hidden');
       }
-      Object.values(sections).forEach(sec => sec.classList.remove('active'));
-      sections.home.classList.add('active');
+      // Đảm bảo luôn có section hiển thị
+      let activeSection = Object.values(sections).find(sec => sec.classList.contains('active'));
+      if (!activeSection) sections.home.classList.add('active');
     }
 
     window.showSection = function(section) {
       Object.values(sections).forEach(sec => sec.classList.remove('active'));
-      sections[section].classList.add('active');
+      if (sections[section]) {
+        sections[section].classList.add('active');
+      } else {
+        sections.home.classList.add('active'); // Fallback nếu section không hợp lệ
+      }
       sidebar.classList.remove('open');
+      if (section === 'options' || section === 'vng' || section === 'international' || section === 'script') loadUserData(section);
+      if (section === 'account') loadAccountData();
+      if (section === 'admin') loadAdminData();
       updateLoginState();
     };
 
@@ -311,8 +407,6 @@
         return;
       }
       showSection(section);
-      if (section === 'account') loadAccountData();
-      if (section === 'admin') loadAdminData();
     };
 
     window.register = function(event) {
@@ -339,7 +433,6 @@
       if (user) {
         currentUser = user;
         showSection('home');
-        updateLoginState();
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -383,7 +476,6 @@
       localStorage.setItem('users', JSON.stringify(users));
       currentUser = null;
       showSection('home');
-      updateLoginState();
     };
 
     window.addFile = function(type) {
@@ -406,6 +498,68 @@
       loadAdminData();
     };
 
+    window.deleteFile = function(type, index) {
+      if (type === 'vng') {
+        vngFiles.splice(index, 1);
+        localStorage.setItem('vngFiles', JSON.stringify(vngFiles));
+      } else if (type === 'international') {
+        internationalFiles.splice(index, 1);
+        localStorage.setItem('internationalFiles', JSON.stringify(internationalFiles));
+      }
+      loadAdminData();
+    };
+
+    window.addScript = function() {
+      const scriptName = document.getElementById('script-name').value;
+      const scriptText = document.getElementById('script-text').value;
+      if (!scriptName || !scriptText) {
+        alert('Vui lòng nhập tên và nội dung script!');
+        return;
+      }
+      scripts.push({ name: scriptName, content: scriptText });
+      localStorage.setItem('scripts', JSON.stringify(scripts));
+      document.getElementById('script-name').value = '';
+      document.getElementById('script-text').value = '';
+      loadAdminData();
+    };
+
+    window.deleteScript = function(index) {
+      scripts.splice(index, 1);
+      localStorage.setItem('scripts', JSON.stringify(scripts));
+      loadAdminData();
+    };
+
+    window.addImage = function() {
+      const imageName = document.getElementById('image-name').value;
+      if (!imageName) {
+        alert('Vui lòng nhập tên hoặc URL hình ảnh!');
+        return;
+      }
+      images.push(imageName);
+      localStorage.setItem('images', JSON.stringify(images));
+      document.getElementById('image-name').value = '';
+      loadAdminData();
+    };
+
+    window.deleteImage = function(index) {
+      images.splice(index, 1);
+      localStorage.setItem('images', JSON.stringify(images));
+      loadAdminData();
+    };
+
+    window.addSocialLink = function(platform) {
+      const url = document.getElementById(`${platform}-url`).value;
+      if (!url) {
+        alert(`Vui lòng nhập link ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`);
+        return;
+      }
+      socialLinks[platform] = url;
+      localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
+      alert(`Thêm link ${platform.charAt(0).toUpperCase() + platform.slice(1)} thành công!`);
+      document.getElementById(`${platform}-url`).value = '';
+      updateSocialLinks();
+    };
+
     window.openSocialLink = function(platform) {
       const url = socialLinks[platform];
       if (url) {
@@ -426,12 +580,75 @@
       const adminAvatar = document.getElementById('admin-avatar');
       adminAvatar.src = currentUser.avatar;
       const vngList = document.getElementById('vng-files');
-      vngList.innerHTML = vngFiles.map(file => `<li>${file.name} ${file.url ? `<a href="${file.url}" target="_blank">Tải xuống</a>` : ''}</li>`).join('');
+      vngList.innerHTML = vngFiles.map((file, index) => `
+        <li>
+          ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+          <button class="delete-btn" onclick="deleteFile('vng', ${index})">Xóa</button>
+        </li>
+      `).join('');
       const internationalList = document.getElementById('international-files');
-      internationalList.innerHTML = internationalFiles.map(file => `<li>${file.name} ${file.url ? `<a href="${file.url}" target="_blank">Tải xuống</a>` : ''}</li>`).join('');
+      internationalList.innerHTML = internationalFiles.map((file, index) => `
+        <li>
+          ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+          <button class="delete-btn" onclick="deleteFile('international', ${index})">Xóa</button>
+        </li>
+      `).join('');
+      const scriptList = document.getElementById('script-list');
+      scriptList.innerHTML = scripts.map((script, index) => `
+        <li>
+          <strong>${script.name}</strong>: ${script.content}
+          <button class="delete-btn" onclick="deleteScript(${index})">Xóa</button>
+        </li>
+      `).join('');
+      const imageList = document.getElementById('image-list');
+      imageList.innerHTML = images.map((image, index) => `
+        <li>
+          ${image}
+          <button class="delete-btn" onclick="deleteImage(${index})">Xóa</button>
+        </li>
+      `).join('');
+    }
+
+    function loadUserData(type) {
+      if (type === 'vng') {
+        const vngList = document.getElementById('vng-files-user');
+        vngList.innerHTML = vngFiles.length > 0
+          ? vngFiles.map(file => `
+              <li>
+                ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+              </li>
+            `).join('')
+          : '<li>Chưa có file nào.</li>';
+      } else if (type === 'international') {
+        const internationalList = document.getElementById('international-files-user');
+        internationalList.innerHTML = internationalFiles.length > 0
+          ? internationalFiles.map(file => `
+              <li>
+                ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+              </li>
+            `).join('')
+          : '<li>Chưa có file nào.</li>';
+      } else if (type === 'script') {
+        const scriptList = document.getElementById('script-list-user');
+        scriptList.innerHTML = scripts.length > 0
+          ? scripts.map(script => `<li><strong>${script.name}</strong>: ${script.content}</li>`).join('')
+          : '<li>Chưa có script nào.</li>';
+        const imageList = document.getElementById('image-list-user');
+        imageList.innerHTML = images.length > 0
+          ? images.map(image => `<li>${image}</li>`).join('')
+          : '<li>Chưa có hình ảnh nào.</li>';
+      }
+    }
+
+    function updateSocialLinks() {
+      document.querySelectorAll('.social-links a').forEach(link => {
+        const platform = link.textContent.toLowerCase();
+        link.href = socialLinks[platform] || '#';
+      });
     }
 
     updateLoginState();
+    updateSocialLinks();
   </script>
 </body>
   </html>
