@@ -244,15 +244,16 @@
         loginPrompt.classList.remove('hidden');
         authButtons.classList.remove('hidden');
         socialLinksSection.classList.add('hidden');
+        adminSection.classList.add('hidden'); // Ẩn admin section khi chưa đăng nhập
       } else {
         hamburger.classList.remove('hidden');
         loginPrompt.classList.add('hidden');
         authButtons.classList.add('hidden');
         socialLinksSection.classList.remove('hidden');
+        adminSection.classList.add('hidden'); // Ẩn admin section khi không ở chế độ admin
       }
-      // Đảm bảo giao diện được cập nhật
       setTimeout(() => {
-        homeSection.style.display = currentUser ? 'block' : 'block';
+        homeSection.style.display = 'block'; // Đảm bảo home section luôn hiển thị
       }, 0);
     }
 
@@ -267,20 +268,19 @@
     window.navigate = function(section) {
       if (currentUser) {
         toggleMenu();
+        homeSection.classList.add('hidden');
         if (section === 'content') {
-          homeSection.classList.add('hidden');
           optionsSection.classList.remove('hidden');
         } else if (section === 'account') {
-          homeSection.classList.add('hidden');
           accountSection.classList.remove('hidden');
           loadAccountData();
         } else if (section === 'admin') {
           if (currentUser.role === 'admin') {
-            homeSection.classList.add('hidden');
             adminSection.classList.remove('hidden');
             loadAdminData();
           } else {
             alert('Chỉ admin mới có quyền truy cập!');
+            homeSection.classList.remove('hidden');
           }
         }
       }
@@ -293,11 +293,11 @@
       loginSection.classList.add('hidden');
       accountSection.classList.add('hidden');
       optionsSection.classList.add('hidden');
-      adminSection.classList.add('hidden');
+      adminSection.classList.add('hidden'); // Đảm bảo ẩn admin khi quay về
       vngSection.classList.add('hidden');
       internationalSection.classList.add('hidden');
       scriptSection.classList.add('hidden');
-      updateLoginState(); // Cập nhật trạng thái khi quay về trang chủ
+      updateLoginState(); // Cập nhật trạng thái
     };
 
     document.getElementById('to-login').addEventListener('click', () => {
@@ -355,7 +355,7 @@
         currentUser = user;
         loginSection.classList.add('hidden');
         homeSection.classList.remove('hidden');
-        updateLoginState(); // Đảm bảo cập nhật trạng thái ngay sau đăng nhập
+        updateLoginState(); // Cập nhật trạng thái ngay sau đăng nhập
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -402,7 +402,7 @@
       alert('Xóa tài khoản thành công!');
       accountSection.classList.add('hidden');
       homeSection.classList.remove('hidden');
-      updateLoginState(); // Cập nhật trạng thái sau khi xóa tài khoản
+      updateLoginState(); // Cập nhật trạng thái
     };
 
     function loadAccountData() {
@@ -413,34 +413,17 @@
     }
 
     // Xử lý nút quay lại
-    document.getElementById('back-account').addEventListener('click', () => {
-      accountSection.classList.add('hidden');
-      homeSection.classList.remove('hidden');
-      updateLoginState(); // Cập nhật trạng thái khi quay lại
-    });
-
-    document.getElementById('back-options').addEventListener('click', () => {
-      optionsSection.classList.add('hidden');
-      homeSection.classList.remove('hidden');
-      updateLoginState(); // Cập nhật trạng thái khi quay lại
-    });
-
-    document.getElementById('admin-back').addEventListener('click', () => {
-      adminSection.classList.add('hidden');
-      homeSection.classList.remove('hidden');
-      updateLoginState(); // Cập nhật trạng thái khi quay lại
-    });
-
+    document.getElementById('back-account').addEventListener('click', navigateToHome);
+    document.getElementById('back-options').addEventListener('click', navigateToHome);
+    document.getElementById('admin-back').addEventListener('click', navigateToHome);
     document.getElementById('back-vng').addEventListener('click', () => {
       vngSection.classList.add('hidden');
       optionsSection.classList.remove('hidden');
     });
-
     document.getElementById('back-international').addEventListener('click', () => {
       internationalSection.classList.add('hidden');
       optionsSection.classList.remove('hidden');
     });
-
     document.getElementById('back-script').addEventListener('click', () => {
       scriptSection.classList.add('hidden');
       optionsSection.classList.remove('hidden');
@@ -650,4 +633,4 @@
     updateSocialLinks();
   </script>
 </body>
-                            </html>
+      </html>
