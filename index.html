@@ -7,8 +7,18 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Trang chủ -->
+  <div id="home-section" class="form-container">
+    <h2>Chào mừng đến với hệ thống</h2>
+    <div class="options">
+      <button id="to-content">Xem nội dung</button>
+      <button id="to-account">Tài khoản</button>
+      <button id="to-admin">Admin</button>
+    </div>
+  </div>
+
   <!-- Đăng ký -->
-  <div id="register-section" class="form-container">
+  <div id="register-section" class="form-container hidden">
     <h2>Đăng ký</h2>
     <form id="register-form">
       <div class="form-group">
@@ -41,15 +51,36 @@
     <p>Chưa có tài khoản? <a href="#" id="to-register">Đăng ký</a></p>
   </div>
 
-  <!-- Lựa chọn sau đăng nhập (người dùng thường) -->
+  <!-- Tài khoản -->
+  <div id="account-section" class="form-container hidden">
+    <h2>Quản lý tài khoản</h2>
+    <div class="form-group">
+      <h3>Đổi mật khẩu</h3>
+      <input type="password" id="new-password" placeholder="Mật khẩu mới">
+      <button onclick="changePassword()">Đổi mật khẩu</button>
+    </div>
+    <div class="form-group">
+      <h3>Thêm Gmail</h3>
+      <input type="email" id="gmail" placeholder="Nhập Gmail">
+      <button onclick="addGmail()">Thêm Gmail</button>
+      <p id="gmail-display"></p>
+    </div>
+    <div class="form-group">
+      <h3>Xóa tài khoản</h3>
+      <button onclick="deleteAccount()" class="delete-btn">Xóa tài khoản</button>
+    </div>
+    <button id="back-account" class="back-btn">Quay lại</button>
+  </div>
+
+  <!-- Lựa chọn nội dung (người dùng thường) -->
   <div id="options-section" class="form-container hidden">
-    <h2>Chào mừng bạn!</h2>
+    <h2>Chọn nội dung</h2>
     <div class="options">
       <button id="client-vng">Client VNG</button>
       <button id="client-international">Client Quốc tế</button>
       <button id="script">Script</button>
     </div>
-    <button id="logout" class="logout">Đăng xuất</button>
+    <button id="back-options" class="back-btn">Quay lại</button>
   </div>
 
   <!-- Hiển thị file Client VNG -->
@@ -98,7 +129,8 @@
       <!-- Thêm Script -->
       <div class="form-group">
         <h3>Thêm Script</h3>
-        <textarea id="script-text" placeholder="Nhập script"></textarea>
+        <input type="text" id="script-name" placeholder="Tên script">
+        <textarea id="script-text" placeholder="Nội dung script"></textarea>
         <button onclick="addScript()">Thêm Script</button>
         <ul id="script-list" class="file-list"></ul>
       </div>
@@ -110,12 +142,12 @@
         <ul id="image-list" class="file-list"></ul>
       </div>
     </div>
-    <button id="admin-logout" class="logout">Đăng xuất</button>
+    <button id="admin-back" class="back-btn">Quay lại</button>
   </div>
 
   <script>
     // Khởi tạo admin mặc định
-    const defaultAdmin = { username: 'admin', password: 'admin123', role: 'admin' };
+    const defaultAdmin = { username: 'admin', password: 'admin123', role: 'admin', gmail: '' };
     if (!localStorage.getItem('users')) {
       localStorage.setItem('users', JSON.stringify([defaultAdmin]));
     }
@@ -125,15 +157,53 @@
     let internationalFiles = JSON.parse(localStorage.getItem('internationalFiles')) || [];
     let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
     let images = JSON.parse(localStorage.getItem('images')) || [];
+    let currentUser = null;
 
     // Chuyển đổi giữa các section
+    const homeSection = document.getElementById('home-section');
     const registerSection = document.getElementById('register-section');
     const loginSection = document.getElementById('login-section');
+    const accountSection = document.getElementById('account-section');
     const optionsSection = document.getElementById('options-section');
     const adminSection = document.getElementById('admin-section');
     const vngSection = document.getElementById('vng-section');
     const internationalSection = document.getElementById('international-section');
     const scriptSection = document.getElementById('script-section');
+
+    // Xử lý trang chủ
+    document.getElementById('to-content').addEventListener('click', () => {
+      if (!currentUser) {
+        homeSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+      } else {
+        homeSection.classList.add('hidden');
+        optionsSection.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('to-account').addEventListener('click', () => {
+      if (!currentUser) {
+        homeSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+      } else {
+        homeSection.classList.add('hidden');
+        accountSection.classList.remove('hidden');
+        loadAccountData();
+      }
+    });
+
+    document.getElementById('to-admin').addEventListener('click', () => {
+      if (!currentUser) {
+        homeSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+      } else if (currentUser.role === 'admin') {
+        homeSection.classList.add('hidden');
+        adminSection.classList.remove('hidden');
+        loadAdminData();
+      } else {
+        alert('Chỉ admin mới có quyền truy cập!');
+      }
+    });
 
     document.getElementById('to-login').addEventListener('click', () => {
       registerSection.classList.add('hidden');
@@ -155,7 +225,7 @@
         alert('Tên người dùng đã tồn tại!');
         return;
       }
-      users.push({ username, password, role: 'user' });
+      users.push({ username, password, role: 'user', gmail: '' });
       localStorage.setItem('users', JSON.stringify(users));
       alert('Đăng ký thành công!');
       registerSection.classList.add('hidden');
@@ -170,31 +240,94 @@
       const users = JSON.parse(localStorage.getItem('users')) || [];
       const user = users.find(u => u.username === username && u.password === password);
       if (user) {
-        if (user.role === 'admin') {
-          loginSection.classList.add('hidden');
-          adminSection.classList.remove('hidden');
-          loadAdminData();
-        } else {
-          loginSection.classList.add('hidden');
-          optionsSection.classList.remove('hidden');
-        }
+        currentUser = user;
+        loginSection.classList.add('hidden');
+        homeSection.classList.remove('hidden');
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
     });
 
-    // Xử lý đăng xuất
-    document.getElementById('logout').addEventListener('click', () => {
+    // Xử lý tài khoản
+    window.changePassword = function() {
+      const newPassword = document.getElementById('new-password').value;
+      if (!newPassword) {
+        alert('Vui lòng nhập mật khẩu mới!');
+        return;
+      }
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const userIndex = users.findIndex(u => u.username === currentUser.username);
+      users[userIndex].password = newPassword;
+      currentUser.password = newPassword;
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('Đổi mật khẩu thành công!');
+      document.getElementById('new-password').value = '';
+    };
+
+    window.addGmail = function() {
+      const gmail = document.getElementById('gmail').value;
+      if (!gmail || !gmail.includes('@')) {
+        alert('Vui lòng nhập Gmail hợp lệ!');
+        return;
+      }
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const userIndex = users.findIndex(u => u.username === currentUser.username);
+      users[userIndex].gmail = gmail;
+      currentUser.gmail = gmail;
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('Thêm Gmail thành công!');
+      document.getElementById('gmail').value = '';
+      loadAccountData();
+    };
+
+    window.deleteAccount = function() {
+      if (!confirm('Bạn có chắc muốn xóa tài khoản?')) return;
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      users = users.filter(u => u.username !== currentUser.username);
+      localStorage.setItem('users', JSON.stringify(users));
+      currentUser = null;
+      alert('Xóa tài khoản thành công!');
+      accountSection.classList.add('hidden');
+      homeSection.classList.remove('hidden');
+    };
+
+    function loadAccountData() {
+      const gmailDisplay = document.getElementById('gmail-display');
+      gmailDisplay.textContent = currentUser.gmail ? `Gmail hiện tại: ${currentUser.gmail}` : 'Chưa có Gmail.';
+    }
+
+    // Xử lý nút quay lại
+    document.getElementById('back-account').addEventListener('click', () => {
+      accountSection.classList.add('hidden');
+      homeSection.classList.remove('hidden');
+    });
+
+    document.getElementById('back-options').addEventListener('click', () => {
       optionsSection.classList.add('hidden');
-      loginSection.classList.remove('hidden');
+      homeSection.classList.remove('hidden');
     });
 
-    document.getElementById('admin-logout').addEventListener('click', () => {
+    document.getElementById('admin-back').addEventListener('click', () => {
       adminSection.classList.add('hidden');
-      loginSection.classList.remove('hidden');
+      homeSection.classList.remove('hidden');
     });
 
-    // Xử lý các lựa chọn (người dùng thường)
+    document.getElementById('back-vng').addEventListener('click', () => {
+      vngSection.classList.add('hidden');
+      optionsSection.classList.remove('hidden');
+    });
+
+    document.getElementById('back-international').addEventListener('click', () => {
+      internationalSection.classList.add('hidden');
+      optionsSection.classList.remove('hidden');
+    });
+
+    document.getElementById('back-script').addEventListener('click', () => {
+      scriptSection.classList.add('hidden');
+      optionsSection.classList.remove('hidden');
+    });
+
+    // Xử lý lựa chọn nội dung (người dùng thường)
     document.getElementById('client-vng').addEventListener('click', () => {
       optionsSection.classList.add('hidden');
       vngSection.classList.remove('hidden');
@@ -211,22 +344,6 @@
       optionsSection.classList.add('hidden');
       scriptSection.classList.remove('hidden');
       loadUserData('script');
-    });
-
-    // Xử lý nút quay lại
-    document.getElementById('back-vng').addEventListener('click', () => {
-      vngSection.classList.add('hidden');
-      optionsSection.classList.remove('hidden');
-    });
-
-    document.getElementById('back-international').addEventListener('click', () => {
-      internationalSection.classList.add('hidden');
-      optionsSection.classList.remove('hidden');
-    });
-
-    document.getElementById('back-script').addEventListener('click', () => {
-      scriptSection.classList.add('hidden');
-      optionsSection.classList.remove('hidden');
     });
 
     // Hàm thêm file
@@ -252,13 +369,15 @@
 
     // Hàm thêm script
     window.addScript = function() {
+      const scriptName = document.getElementById('script-name').value;
       const scriptText = document.getElementById('script-text').value;
-      if (!scriptText) {
-        alert('Vui lòng nhập script!');
+      if (!scriptName || !scriptText) {
+        alert('Vui lòng nhập tên và nội dung script!');
         return;
       }
-      scripts.push(scriptText);
+      scripts.push({ name: scriptName, content: scriptText });
       localStorage.setItem('scripts', JSON.stringify(scripts));
+      document.getElementById('script-name').value = '';
       document.getElementById('script-text').value = '';
       loadAdminData();
     };
@@ -304,7 +423,6 @@
 
     // Hàm tải dữ liệu admin
     function loadAdminData() {
-      // Hiển thị file Client VNG
       const vngList = document.getElementById('vng-files');
       vngList.innerHTML = vngFiles.map((file, index) => `
         <li>
@@ -313,7 +431,6 @@
         </li>
       `).join('');
 
-      // Hiển thị file Client Quốc tế
       const internationalList = document.getElementById('international-files');
       internationalList.innerHTML = internationalFiles.map((file, index) => `
         <li>
@@ -322,16 +439,14 @@
         </li>
       `).join('');
 
-      // Hiển thị script
       const scriptList = document.getElementById('script-list');
       scriptList.innerHTML = scripts.map((script, index) => `
         <li>
-          ${script}
+          <strong>${script.name}</strong>: ${script.content}
           <button class="delete-btn" onclick="deleteScript(${index})">Xóa</button>
         </li>
       `).join('');
 
-      // Hiển thị hình ảnh
       const imageList = document.getElementById('image-list');
       imageList.innerHTML = images.map((image, index) => `
         <li>
@@ -364,7 +479,7 @@
       } else if (type === 'script') {
         const scriptList = document.getElementById('script-list-user');
         scriptList.innerHTML = scripts.length > 0
-          ? scripts.map(script => `<li>${script}</li>`).join('')
+          ? scripts.map(script => `<li><strong>${script.name}</strong>: ${script.content}</li>`).join('')
           : '<li>Chưa có script nào.</li>';
         const imageList = document.getElementById('image-list-user');
         imageList.innerHTML = images.length > 0
@@ -374,4 +489,4 @@
     }
   </script>
 </body>
-    </html>
+  </html>
