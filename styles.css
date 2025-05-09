@@ -46,6 +46,7 @@ input, textarea {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 textarea {
@@ -99,6 +100,15 @@ button:hover {
   background-color: #c82333;
 }
 
+.back-btn {
+  background-color: #6c757d;
+  margin-top: 1rem;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+}
+
 p {
   margin-top: 1rem;
   color: #555;
@@ -128,7 +138,21 @@ a:hover {
 }
 
 .file-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
   color: #333;
+}
+
+.delete-btn {
+  width: auto;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  background-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
   }
