@@ -27,7 +27,7 @@
         <li><a href="#" id="zalo-link" onclick="openSocialLink('zalo')">Zalo</a></li>
         <li><a href="#" id="tiktok-link" onclick="openSocialLink('tiktok')">TikTok</a></li>
         <li><a href="#" id="youtube-link" onclick="openSocialLink('youtube')">Youtube</a></li>
-        <li><a href="#" onclick="navigate('content')">Trang chủ</a></li>
+        <li><a href="#" onclick="navigateToHome()">Trang chủ</a></li>
       </ul>
     </div>
   </div>
@@ -250,6 +250,10 @@
         authButtons.classList.add('hidden');
         socialLinksSection.classList.remove('hidden');
       }
+      // Đảm bảo giao diện được cập nhật
+      setTimeout(() => {
+        homeSection.style.display = currentUser ? 'block' : 'block';
+      }, 0);
     }
 
     // Mở/đóng sidebar
@@ -293,6 +297,7 @@
       vngSection.classList.add('hidden');
       internationalSection.classList.add('hidden');
       scriptSection.classList.add('hidden');
+      updateLoginState(); // Cập nhật trạng thái khi quay về trang chủ
     };
 
     document.getElementById('to-login').addEventListener('click', () => {
@@ -350,7 +355,7 @@
         currentUser = user;
         loginSection.classList.add('hidden');
         homeSection.classList.remove('hidden');
-        updateLoginState(); // Cập nhật trạng thái sau khi đăng nhập
+        updateLoginState(); // Đảm bảo cập nhật trạng thái ngay sau đăng nhập
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -411,16 +416,19 @@
     document.getElementById('back-account').addEventListener('click', () => {
       accountSection.classList.add('hidden');
       homeSection.classList.remove('hidden');
+      updateLoginState(); // Cập nhật trạng thái khi quay lại
     });
 
     document.getElementById('back-options').addEventListener('click', () => {
       optionsSection.classList.add('hidden');
       homeSection.classList.remove('hidden');
+      updateLoginState(); // Cập nhật trạng thái khi quay lại
     });
 
     document.getElementById('admin-back').addEventListener('click', () => {
       adminSection.classList.add('hidden');
       homeSection.classList.remove('hidden');
+      updateLoginState(); // Cập nhật trạng thái khi quay lại
     });
 
     document.getElementById('back-vng').addEventListener('click', () => {
@@ -642,4 +650,4 @@
     updateSocialLinks();
   </script>
 </body>
-</html>
+                            </html>
