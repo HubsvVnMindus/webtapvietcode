@@ -15,7 +15,11 @@
       <div class="bar"></div>
     </div>
     <h2>Chào mừng đến với hệ thống</h2>
-    <p id="login-prompt">Vui lòng đăng nhập để tiếp tục.</p>
+    <p id="login-prompt" class="hidden">Vui lòng đăng nhập để tiếp tục.</p>
+    <div id="auth-buttons" class="auth-buttons">
+      <button id="to-register-btn" class="auth-btn">Đăng ký</button>
+      <button id="to-login-btn" class="auth-btn">Đăng nhập</button>
+    </div>
   </div>
 
   <!-- Sidebar Menu -->
@@ -202,15 +206,18 @@
     const sidebar = document.getElementById('sidebar');
     const hamburger = document.getElementById('hamburger');
     const loginPrompt = document.getElementById('login-prompt');
+    const authButtons = document.getElementById('auth-buttons');
 
-    // Hiển thị/ẩn hamburger và prompt dựa trên trạng thái đăng nhập
+    // Hiển thị/ẩn hamburger, prompt, và nút đăng ký/đăng nhập dựa trên trạng thái đăng nhập
     function updateLoginState() {
       if (!currentUser) {
         hamburger.classList.add('hidden');
         loginPrompt.classList.remove('hidden');
+        authButtons.classList.remove('hidden');
       } else {
         hamburger.classList.remove('hidden');
         loginPrompt.classList.add('hidden');
+        authButtons.classList.add('hidden');
       }
     }
 
@@ -252,6 +259,17 @@
     document.getElementById('to-register').addEventListener('click', () => {
       loginSection.classList.add('hidden');
       registerSection.classList.remove('hidden');
+    });
+
+    // Xử lý nút Đăng ký và Đăng nhập trên trang chủ
+    document.getElementById('to-register-btn').addEventListener('click', () => {
+      homeSection.classList.add('hidden');
+      registerSection.classList.remove('hidden');
+    });
+
+    document.getElementById('to-login-btn').addEventListener('click', () => {
+      homeSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
     });
 
     // Xử lý đăng ký
@@ -477,7 +495,8 @@
       const vngList = document.getElementById('vng-files');
       vngList.innerHTML = vngFiles.map((file, index) => `
         <li>
-          ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+          <span>${file.name}</span>
+          ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
           <button class="delete-btn" onclick="deleteFile('vng', ${index})">Xóa</button>
         </li>
       `).join('');
@@ -485,7 +504,8 @@
       const internationalList = document.getElementById('international-files');
       internationalList.innerHTML = internationalFiles.map((file, index) => `
         <li>
-          ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+          <span>${file.name}</span>
+          ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
           <button class="delete-btn" onclick="deleteFile('international', ${index})">Xóa</button>
         </li>
       `).join('');
@@ -514,7 +534,8 @@
         vngList.innerHTML = vngFiles.length > 0
           ? vngFiles.map(file => `
               <li>
-                ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+                <span>${file.name}</span>
+                ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
               </li>
             `).join('')
           : '<li>Chưa có file nào.</li>';
@@ -523,7 +544,8 @@
         internationalList.innerHTML = internationalFiles.length > 0
           ? internationalFiles.map(file => `
               <li>
-                ${file.name}${file.url ? ` (<a href="${file.url}" target="_blank">Link</a>)` : ''}
+                <span>${file.name}</span>
+                ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
               </li>
             `).join('')
           : '<li>Chưa có file nào.</li>';
@@ -543,4 +565,4 @@
     updateLoginState();
   </script>
 </body>
-    </html>
+        </html>
