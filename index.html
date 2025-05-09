@@ -9,12 +9,13 @@
 <body>
   <!-- Trang chủ -->
   <div id="home-section" class="form-container">
-    <div class="hamburger" onclick="toggleMenu()">
+    <div class="hamburger hidden" id="hamburger" onclick="toggleMenu()">
       <div class="bar"></div>
       <div class="bar"></div>
       <div class="bar"></div>
     </div>
-    <h2>Chào mừng đến với menu</h2>
+    <h2>Chào mừng đến với hệ thống</h2>
+    <p id="login-prompt">Vui lòng đăng nhập để tiếp tục.</p>
   </div>
 
   <!-- Sidebar Menu -->
@@ -24,9 +25,9 @@
       <span class="close-btn" onclick="toggleMenu()">×</span>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#" onclick="navigate('content')">Trang Chủ</a></li>
+      <li><a href="#" onclick="navigate('content')">Xem nội dung</a></li>
       <li><a href="#" onclick="navigate('account')">Tài khoản</a></li>
-      <li><a href="#" onclick="navigate('admin')">Quản lý</a></li>
+      <li><a href="#" onclick="navigate('admin')">Admin</a></li>
     </ul>
   </div>
 
@@ -68,6 +69,11 @@
   <div id="account-section" class="form-container hidden">
     <h2>Quản lý tài khoản</h2>
     <div class="form-group">
+      <h3>Avatar</h3>
+      <img id="user-avatar" class="avatar" alt="Avatar người dùng">
+      <p>Avatar không thể thay đổi.</p>
+    </div>
+    <div class="form-group">
       <h3>Đổi mật khẩu</h3>
       <input type="password" id="new-password" placeholder="Mật khẩu mới">
       <button onclick="changePassword()">Đổi mật khẩu</button>
@@ -87,7 +93,7 @@
 
   <!-- Lựa chọn nội dung (người dùng thường) -->
   <div id="options-section" class="form-container hidden">
-    <h2>Chọn</h2>
+    <h2>Chọn nội dung</h2>
     <div class="options">
       <button id="client-vng">Client VNG</button>
       <button id="client-international">Client Quốc tế</button>
@@ -122,6 +128,11 @@
   <!-- Giao diện admin -->
   <div id="admin-section" class="form-container hidden">
     <h2>Quản lý Admin</h2>
+    <div class="form-group">
+      <h3>Avatar Admin</h3>
+      <img id="admin-avatar" class="avatar" alt="Avatar Admin">
+      <p>Avatar không thể thay đổi.</p>
+    </div>
     <div class="admin-options">
       <!-- Thêm file cho Client VNG -->
       <div class="form-group">
@@ -160,7 +171,13 @@
 
   <script>
     // Khởi tạo admin mặc định
-    const defaultAdmin = { username: 'admin', password: 'admin123', role: 'admin', gmail: '' };
+    const defaultAdmin = { 
+      username: 'Hungdeptrai', 
+      password: 'hungdeptrai345@', 
+      role: 'admin', 
+      gmail: '',
+      avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' // Avatar admin
+    };
     if (!localStorage.getItem('users')) {
       localStorage.setItem('users', JSON.stringify([defaultAdmin]));
     }
@@ -183,42 +200,46 @@
     const internationalSection = document.getElementById('international-section');
     const scriptSection = document.getElementById('script-section');
     const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const loginPrompt = document.getElementById('login-prompt');
+
+    // Hiển thị/ẩn hamburger và prompt dựa trên trạng thái đăng nhập
+    function updateLoginState() {
+      if (!currentUser) {
+        hamburger.classList.add('hidden');
+        loginPrompt.classList.remove('hidden');
+      } else {
+        hamburger.classList.remove('hidden');
+        loginPrompt.classList.add('hidden');
+      }
+    }
 
     // Mở/đóng sidebar
     window.toggleMenu = function() {
-      sidebar.classList.toggle('open');
+      if (currentUser) {
+        sidebar.classList.toggle('open');
+      }
     };
 
     // Điều hướng từ sidebar
     window.navigate = function(section) {
-      toggleMenu();
-      if (section === 'content') {
-        if (!currentUser) {
-          homeSection.classList.add('hidden');
-          loginSection.classList.remove('hidden');
-        } else {
+      if (currentUser) {
+        toggleMenu();
+        if (section === 'content') {
           homeSection.classList.add('hidden');
           optionsSection.classList.remove('hidden');
-        }
-      } else if (section === 'account') {
-        if (!currentUser) {
-          homeSection.classList.add('hidden');
-          loginSection.classList.remove('hidden');
-        } else {
+        } else if (section === 'account') {
           homeSection.classList.add('hidden');
           accountSection.classList.remove('hidden');
           loadAccountData();
-        }
-      } else if (section === 'admin') {
-        if (!currentUser) {
-          homeSection.classList.add('hidden');
-          loginSection.classList.remove('hidden');
-        } else if (currentUser.role === 'admin') {
-          homeSection.classList.add('hidden');
-          adminSection.classList.remove('hidden');
-          loadAdminData();
-        } else {
-          alert('Chỉ admin mới có quyền truy cập!');
+        } else if (section === 'admin') {
+          if (currentUser.role === 'admin') {
+            homeSection.classList.add('hidden');
+            adminSection.classList.remove('hidden');
+            loadAdminData();
+          } else {
+            alert('Chỉ admin mới có quyền truy cập!');
+          }
         }
       }
     };
@@ -243,7 +264,13 @@
         alert('Tên người dùng đã tồn tại!');
         return;
       }
-      users.push({ username, password, role: 'user', gmail: '' });
+      users.push({ 
+        username, 
+        password, 
+        role: 'user', 
+        gmail: '',
+        avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' // Avatar người dùng thường
+      });
       localStorage.setItem('users', JSON.stringify(users));
       alert('Đăng ký thành công!');
       registerSection.classList.add('hidden');
@@ -261,6 +288,7 @@
         currentUser = user;
         loginSection.classList.add('hidden');
         homeSection.classList.remove('hidden');
+        updateLoginState();
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -307,11 +335,14 @@
       alert('Xóa tài khoản thành công!');
       accountSection.classList.add('hidden');
       homeSection.classList.remove('hidden');
+      updateLoginState();
     };
 
     function loadAccountData() {
       const gmailDisplay = document.getElementById('gmail-display');
       gmailDisplay.textContent = currentUser.gmail ? `Gmail hiện tại: ${currentUser.gmail}` : 'Chưa có Gmail.';
+      const userAvatar = document.getElementById('user-avatar');
+      userAvatar.src = currentUser.avatar;
     }
 
     // Xử lý nút quay lại
@@ -441,6 +472,8 @@
 
     // Hàm tải dữ liệu admin
     function loadAdminData() {
+      const adminAvatar = document.getElementById('admin-avatar');
+      adminAvatar.src = currentUser.avatar;
       const vngList = document.getElementById('vng-files');
       vngList.innerHTML = vngFiles.map((file, index) => `
         <li>
@@ -505,6 +538,9 @@
           : '<li>Chưa có hình ảnh nào.</li>';
       }
     }
+
+    // Khởi tạo trạng thái ban đầu
+    updateLoginState();
   </script>
 </body>
-        </html>
+    </html>
