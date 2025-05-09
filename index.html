@@ -102,7 +102,7 @@
       <h3>Xóa tài khoản</h3>
       <button onclick="deleteAccount()" class="delete-btn">Xóa tài khoản</button>
     </div>
-    <button id="back-account" class="back-btn">Quay lại</button>
+    <button id="back-account" class="back-btn" onclick="navigateToHome()">Quay lại</button>
   </div>
 
   <!-- Lựa chọn nội dung (người dùng thường) -->
@@ -113,21 +113,21 @@
       <button id="client-international">Client Quốc tế</button>
       <button id="script">Script</button>
     </div>
-    <button id="back-options" class="back-btn">Quay lại</button>
+    <button id="back-options" class="back-btn" onclick="navigateToHome()">Quay lại</button>
   </div>
 
   <!-- Hiển thị file Client VNG -->
   <div id="vng-section" class="form-container hidden">
     <h2>Danh sách file Client VNG</h2>
     <ul id="vng-files-user" class="file-list"></ul>
-    <button id="back-vng" class="back-btn">Quay lại</button>
+    <button id="back-vng" class="back-btn" onclick="goBack('options')">Quay lại</button>
   </div>
 
   <!-- Hiển thị file Client Quốc tế -->
   <div id="international-section" class="form-container hidden">
     <h2>Danh sách file Client Quốc tế</h2>
     <ul id="international-files-user" class="file-list"></ul>
-    <button id="back-international" class="back-btn">Quay lại</button>
+    <button id="back-international" class="back-btn" onclick="goBack('options')">Quay lại</button>
   </div>
 
   <!-- Hiển thị Script và Hình ảnh -->
@@ -136,7 +136,7 @@
     <ul id="script-list-user" class="file-list"></ul>
     <h2>Danh sách Hình ảnh</h2>
     <ul id="image-list-user" class="file-list"></ul>
-    <button id="back-script" class="back-btn">Quay lại</button>
+    <button id="back-script" class="back-btn" onclick="goBack('options')">Quay lại</button>
   </div>
 
   <!-- Giao diện admin -->
@@ -192,7 +192,7 @@
         <button onclick="addSocialLink('youtube')">Thêm Youtube</button>
       </div>
     </div>
-    <button id="admin-back" class="back-btn">Quay lại</button>
+    <button id="admin-back" class="back-btn" onclick="navigateToHome()">Quay lại</button>
   </div>
 
   <script>
@@ -222,20 +222,22 @@
     let currentUser = null;
 
     // Chuyển đổi giữa các section
-    const homeSection = document.getElementById('home-section');
-    const registerSection = document.getElementById('register-section');
-    const loginSection = document.getElementById('login-section');
-    const accountSection = document.getElementById('account-section');
-    const optionsSection = document.getElementById('options-section');
-    const adminSection = document.getElementById('admin-section');
-    const vngSection = document.getElementById('vng-section');
-    const internationalSection = document.getElementById('international-section');
-    const scriptSection = document.getElementById('script-section');
-    const sidebar = document.getElementById('sidebar');
+    const sections = {
+      home: document.getElementById('home-section'),
+      register: document.getElementById('register-section'),
+      login: document.getElementById('login-section'),
+      account: document.getElementById('account-section'),
+      options: document.getElementById('options-section'),
+      admin: document.getElementById('admin-section'),
+      vng: document.getElementById('vng-section'),
+      international: document.getElementById('international-section'),
+      script: document.getElementById('script-section')
+    };
     const hamburger = document.getElementById('hamburger');
     const loginPrompt = document.getElementById('login-prompt');
     const authButtons = document.getElementById('auth-buttons');
     const socialLinksSection = document.getElementById('social-links');
+    const sidebar = document.getElementById('sidebar');
 
     // Hiển thị/ẩn các phần dựa trên trạng thái đăng nhập
     function updateLoginState() {
@@ -244,16 +246,23 @@
         loginPrompt.classList.remove('hidden');
         authButtons.classList.remove('hidden');
         socialLinksSection.classList.add('hidden');
-        adminSection.classList.add('hidden'); // Ẩn admin section khi chưa đăng nhập
+        Object.values(sections).forEach(sec => sec.classList.add('hidden'));
+        sections.home.classList.remove('hidden');
       } else {
         hamburger.classList.remove('hidden');
         loginPrompt.classList.add('hidden');
         authButtons.classList.add('hidden');
         socialLinksSection.classList.remove('hidden');
-        adminSection.classList.add('hidden'); // Ẩn admin section khi không ở chế độ admin
+        if (sections.admin.classList.contains('hidden') === false && currentUser.role !== 'admin') {
+          sections.admin.classList.add('hidden');
+        }
+        Object.values(sections).forEach(sec => {
+          if (sec !== sections.home) sec.classList.add('hidden');
+        });
+        sections.home.classList.remove('hidden');
       }
       setTimeout(() => {
-        homeSection.style.display = 'block'; // Đảm bảo home section luôn hiển thị
+        sections.home.style.display = 'block';
       }, 0);
     }
 
@@ -264,61 +273,52 @@
       }
     };
 
-    // Điều hướng từ sidebar
+    // Điều hướng
     window.navigate = function(section) {
-      if (currentUser) {
-        toggleMenu();
-        homeSection.classList.add('hidden');
-        if (section === 'content') {
-          optionsSection.classList.remove('hidden');
-        } else if (section === 'account') {
-          accountSection.classList.remove('hidden');
-          loadAccountData();
-        } else if (section === 'admin') {
-          if (currentUser.role === 'admin') {
-            adminSection.classList.remove('hidden');
-            loadAdminData();
-          } else {
-            alert('Chỉ admin mới có quyền truy cập!');
-            homeSection.classList.remove('hidden');
-          }
-        }
+      if (!currentUser) return;
+      toggleMenu();
+      Object.values(sections).forEach(sec => sec.classList.add('hidden'));
+      if (section === 'admin' && currentUser.role !== 'admin') {
+        alert('Chỉ admin mới có quyền truy cập!');
+        sections.home.classList.remove('hidden');
+      } else {
+        sections[section].classList.remove('hidden');
+        if (section === 'admin') loadAdminData();
+        if (section === 'account') loadAccountData();
+        if (section === 'content') sections.options.classList.remove('hidden');
       }
+      updateLoginState();
     };
 
     // Điều hướng về trang chủ
     window.navigateToHome = function() {
-      homeSection.classList.remove('hidden');
-      registerSection.classList.add('hidden');
-      loginSection.classList.add('hidden');
-      accountSection.classList.add('hidden');
-      optionsSection.classList.add('hidden');
-      adminSection.classList.add('hidden'); // Đảm bảo ẩn admin khi quay về
-      vngSection.classList.add('hidden');
-      internationalSection.classList.add('hidden');
-      scriptSection.classList.add('hidden');
-      updateLoginState(); // Cập nhật trạng thái
+      Object.values(sections).forEach(sec => sec.classList.add('hidden'));
+      sections.home.classList.remove('hidden');
+      updateLoginState();
     };
 
+    // Quay lại section trước
+    window.goBack = function(target) {
+      Object.values(sections).forEach(sec => sec.classList.add('hidden'));
+      sections[target].classList.remove('hidden');
+    };
+
+    // Sự kiện chuyển đổi giữa đăng ký và đăng nhập
     document.getElementById('to-login').addEventListener('click', () => {
-      registerSection.classList.add('hidden');
-      loginSection.classList.remove('hidden');
+      sections.register.classList.add('hidden');
+      sections.login.classList.remove('hidden');
     });
-
     document.getElementById('to-register').addEventListener('click', () => {
-      loginSection.classList.add('hidden');
-      registerSection.classList.remove('hidden');
+      sections.login.classList.add('hidden');
+      sections.register.classList.remove('hidden');
     });
-
-    // Xử lý nút Đăng ký và Đăng nhập trên trang chủ
     document.getElementById('to-register-btn').addEventListener('click', () => {
-      homeSection.classList.add('hidden');
-      registerSection.classList.remove('hidden');
+      sections.home.classList.add('hidden');
+      sections.register.classList.remove('hidden');
     });
-
     document.getElementById('to-login-btn').addEventListener('click', () => {
-      homeSection.classList.add('hidden');
-      loginSection.classList.remove('hidden');
+      sections.home.classList.add('hidden');
+      sections.login.classList.remove('hidden');
     });
 
     // Xử lý đăng ký
@@ -331,17 +331,11 @@
         alert('Tên người dùng đã tồn tại!');
         return;
       }
-      users.push({ 
-        username, 
-        password, 
-        role: 'user', 
-        gmail: '',
-        avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' // Avatar người dùng thường
-      });
+      users.push({ username, password, role: 'user', gmail: '', avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' });
       localStorage.setItem('users', JSON.stringify(users));
       alert('Đăng ký thành công!');
-      registerSection.classList.add('hidden');
-      loginSection.classList.remove('hidden');
+      sections.register.classList.add('hidden');
+      sections.login.classList.remove('hidden');
     });
 
     // Xử lý đăng nhập
@@ -353,9 +347,8 @@
       const user = users.find(u => u.username === username && u.password === password);
       if (user) {
         currentUser = user;
-        loginSection.classList.add('hidden');
-        homeSection.classList.remove('hidden');
-        updateLoginState(); // Cập nhật trạng thái ngay sau đăng nhập
+        sections.login.classList.add('hidden');
+        navigateToHome();
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -399,10 +392,8 @@
       users = users.filter(u => u.username !== currentUser.username);
       localStorage.setItem('users', JSON.stringify(users));
       currentUser = null;
-      alert('Xóa tài khoản thành công!');
-      accountSection.classList.add('hidden');
-      homeSection.classList.remove('hidden');
-      updateLoginState(); // Cập nhật trạng thái
+      sections.account.classList.add('hidden');
+      navigateToHome();
     };
 
     function loadAccountData() {
@@ -412,39 +403,20 @@
       userAvatar.src = currentUser.avatar;
     }
 
-    // Xử lý nút quay lại
-    document.getElementById('back-account').addEventListener('click', navigateToHome);
-    document.getElementById('back-options').addEventListener('click', navigateToHome);
-    document.getElementById('admin-back').addEventListener('click', navigateToHome);
-    document.getElementById('back-vng').addEventListener('click', () => {
-      vngSection.classList.add('hidden');
-      optionsSection.classList.remove('hidden');
-    });
-    document.getElementById('back-international').addEventListener('click', () => {
-      internationalSection.classList.add('hidden');
-      optionsSection.classList.remove('hidden');
-    });
-    document.getElementById('back-script').addEventListener('click', () => {
-      scriptSection.classList.add('hidden');
-      optionsSection.classList.remove('hidden');
-    });
-
-    // Xử lý lựa chọn nội dung (người dùng thường)
+    // Xử lý lựa chọn nội dung
     document.getElementById('client-vng').addEventListener('click', () => {
-      optionsSection.classList.add('hidden');
-      vngSection.classList.remove('hidden');
+      sections.options.classList.add('hidden');
+      sections.vng.classList.remove('hidden');
       loadUserData('vng');
     });
-
     document.getElementById('client-international').addEventListener('click', () => {
-      optionsSection.classList.add('hidden');
-      internationalSection.classList.remove('hidden');
+      sections.options.classList.add('hidden');
+      sections.international.classList.remove('hidden');
       loadUserData('international');
     });
-
     document.getElementById('script').addEventListener('click', () => {
-      optionsSection.classList.add('hidden');
-      scriptSection.classList.remove('hidden');
+      sections.options.classList.add('hidden');
+      sections.script.classList.remove('hidden');
       loadUserData('script');
     });
 
@@ -567,7 +539,6 @@
           <button class="delete-btn" onclick="deleteFile('vng', ${index})">Xóa</button>
         </li>
       `).join('');
-
       const internationalList = document.getElementById('international-files');
       internationalList.innerHTML = internationalFiles.map((file, index) => `
         <li>
@@ -576,7 +547,6 @@
           <button class="delete-btn" onclick="deleteFile('international', ${index})">Xóa</button>
         </li>
       `).join('');
-
       const scriptList = document.getElementById('script-list');
       scriptList.innerHTML = scripts.map((script, index) => `
         <li>
@@ -584,7 +554,6 @@
           <button class="delete-btn" onclick="deleteScript(${index})">Xóa</button>
         </li>
       `).join('');
-
       const imageList = document.getElementById('image-list');
       imageList.innerHTML = images.map((image, index) => `
         <li>
@@ -633,4 +602,4 @@
     updateSocialLinks();
   </script>
 </body>
-      </html>
+              </html>
