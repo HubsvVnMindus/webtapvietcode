@@ -82,6 +82,22 @@
     .card:hover {
       transform: translateY(-2px);
     }
+    .avatar-select {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .avatar-option {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    .avatar-option:hover, .avatar-option.selected {
+      border-color: #1a73e8;
+    }
     .social-links ul {
       list-style: none;
       padding: 0;
@@ -209,6 +225,10 @@
       input, textarea {
         font-size: 0.9em;
       }
+      .avatar-option {
+        width: 50px;
+        height: 50px;
+      }
     }
   </style>
 </head>
@@ -308,7 +328,11 @@
       <div class="card">
         <h3>Avatar</h3>
         <img id="user-avatar" class="avatar" alt="Avatar người dùng" style="width: 100px;">
-        <p>Avatar không thể thay đổi.</p>
+        <div class="avatar-select">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-option" onclick="changeAvatar(this)" data-url="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+          <img src="https://i.imgur.com/your-first-image-url.jpg" class="avatar-option" onclick="changeAvatar(this)" data-url="https://i.imgur.com/your-first-image-url.jpg">
+          <img src="https://i.imgur.com/your-second-image-url.jpg" class="avatar-option" onclick="changeAvatar(this)" data-url="https://i.imgur.com/your-second-image-url.jpg">
+        </div>
       </div>
     </div>
     <div class="form-group">
@@ -552,7 +576,6 @@
         alert('Chỉ admin mới có quyền truy cập!');
         return;
       }
-      // Sử dụng section trực tiếp thay vì ánh xạ
       showSection(section);
     };
 
@@ -630,6 +653,18 @@
         currentUser = null;
         showSection('home');
       }
+    };
+
+    window.changeAvatar = function(element) {
+      const newAvatarUrl = element.getAttribute('data-url');
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const userIndex = users.findIndex(u => u.username === currentUser.username);
+      users[userIndex].avatar = newAvatarUrl;
+      currentUser.avatar = newAvatarUrl;
+      localStorage.setItem('users', JSON.stringify(users));
+      loadAccountData();
+      document.querySelectorAll('.avatar-option').forEach(option => option.classList.remove('selected'));
+      element.classList.add('selected');
     };
 
     window.addFile = function(type) {
@@ -728,6 +763,14 @@
       gmailDisplay.textContent = currentUser.gmail ? `Gmail hiện tại: ${currentUser.gmail}` : 'Chưa có Gmail.';
       const userAvatar = document.getElementById('user-avatar');
       userAvatar.src = currentUser.avatar;
+      // Highlight selected avatar
+      document.querySelectorAll('.avatar-option').forEach(option => {
+        if (option.getAttribute('data-url') === currentUser.avatar) {
+          option.classList.add('selected');
+        } else {
+          option.classList.remove('selected');
+        }
+      });
     }
 
     function loadAdminData() {
