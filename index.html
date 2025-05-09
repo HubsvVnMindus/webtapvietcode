@@ -14,10 +14,21 @@
       <div class="bar"></div>
       <div class="bar"></div>
     </div>
-    <h2>Chào mừng đến Menu</h2>
+    <h2>Chào mừng đến với hệ thống</h2>
+    <p id="login-prompt" class="hidden">Vui lòng đăng nhập để tiếp tục.</p>
     <div id="auth-buttons" class="auth-buttons">
       <button id="to-register-btn" class="auth-btn">Đăng ký</button>
       <button id="to-login-btn" class="auth-btn">Đăng nhập</button>
+    </div>
+    <div id="social-links" class="social-links hidden">
+      <h3>Liên kết mạng xã hội</h3>
+      <ul class="social-list">
+        <li><a href="#" id="facebook-link" onclick="openSocialLink('facebook')">Facebook</a></li>
+        <li><a href="#" id="zalo-link" onclick="openSocialLink('zalo')">Zalo</a></li>
+        <li><a href="#" id="tiktok-link" onclick="openSocialLink('tiktok')">TikTok</a></li>
+        <li><a href="#" id="youtube-link" onclick="openSocialLink('youtube')">Youtube</a></li>
+        <li><a href="#" onclick="navigateToHome()">Trang chủ</a></li>
+      </ul>
     </div>
   </div>
 
@@ -28,9 +39,9 @@
       <span class="close-btn" onclick="toggleMenu()">×</span>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#" onclick="navigate('content')">Trang Chủ</a></li>
+      <li><a href="#" onclick="navigate('content')">Xem nội dung</a></li>
       <li><a href="#" onclick="navigate('account')">Tài khoản</a></li>
-      <li><a href="#" onclick="navigate('admin')">Quản lý</a></li>
+      <li><a href="#" onclick="navigate('admin')">Admin</a></li>
     </ul>
   </div>
 
@@ -168,6 +179,18 @@
         <button onclick="addImage()">Thêm Hình</button>
         <ul id="image-list" class="file-list"></ul>
       </div>
+      <!-- Thêm liên kết mạng xã hội -->
+      <div class="form-group">
+        <h3>Thêm Liên kết Mạng Xã Hội</h3>
+        <input type="text" id="facebook-url" placeholder="Link Facebook">
+        <button onclick="addSocialLink('facebook')">Thêm Facebook</button>
+        <input type="text" id="zalo-url" placeholder="Link Zalo">
+        <button onclick="addSocialLink('zalo')">Thêm Zalo</button>
+        <input type="text" id="tiktok-url" placeholder="Link TikTok">
+        <button onclick="addSocialLink('tiktok')">Thêm TikTok</button>
+        <input type="text" id="youtube-url" placeholder="Link Youtube">
+        <button onclick="addSocialLink('youtube')">Thêm Youtube</button>
+      </div>
     </div>
     <button id="admin-back" class="back-btn">Quay lại</button>
   </div>
@@ -185,11 +208,17 @@
       localStorage.setItem('users', JSON.stringify([defaultAdmin]));
     }
 
-    // Khởi tạo danh sách file, script, và hình ảnh
+    // Khởi tạo danh sách file, script, hình ảnh, và liên kết mạng xã hội
     let vngFiles = JSON.parse(localStorage.getItem('vngFiles')) || [];
     let internationalFiles = JSON.parse(localStorage.getItem('internationalFiles')) || [];
     let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
     let images = JSON.parse(localStorage.getItem('images')) || [];
+    let socialLinks = JSON.parse(localStorage.getItem('socialLinks')) || {
+      facebook: '',
+      zalo: '',
+      tiktok: '',
+      youtube: ''
+    };
     let currentUser = null;
 
     // Chuyển đổi giữa các section
@@ -206,17 +235,20 @@
     const hamburger = document.getElementById('hamburger');
     const loginPrompt = document.getElementById('login-prompt');
     const authButtons = document.getElementById('auth-buttons');
+    const socialLinksSection = document.getElementById('social-links');
 
-    // Hiển thị/ẩn hamburger, prompt, và nút đăng ký/đăng nhập dựa trên trạng thái đăng nhập
+    // Hiển thị/ẩn các phần dựa trên trạng thái đăng nhập
     function updateLoginState() {
       if (!currentUser) {
         hamburger.classList.add('hidden');
         loginPrompt.classList.remove('hidden');
         authButtons.classList.remove('hidden');
+        socialLinksSection.classList.add('hidden');
       } else {
         hamburger.classList.remove('hidden');
         loginPrompt.classList.add('hidden');
         authButtons.classList.add('hidden');
+        socialLinksSection.classList.remove('hidden');
       }
     }
 
@@ -248,6 +280,19 @@
           }
         }
       }
+    };
+
+    // Điều hướng về trang chủ
+    window.navigateToHome = function() {
+      homeSection.classList.remove('hidden');
+      registerSection.classList.add('hidden');
+      loginSection.classList.add('hidden');
+      accountSection.classList.add('hidden');
+      optionsSection.classList.add('hidden');
+      adminSection.classList.add('hidden');
+      vngSection.classList.add('hidden');
+      internationalSection.classList.add('hidden');
+      scriptSection.classList.add('hidden');
     };
 
     document.getElementById('to-login').addEventListener('click', () => {
@@ -487,6 +532,38 @@
       loadAdminData();
     };
 
+    // Hàm thêm liên kết mạng xã hội
+    window.addSocialLink = function(platform) {
+      const url = document.getElementById(`${platform}-url`).value;
+      if (!url) {
+        alert(`Vui lòng nhập link ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`);
+        return;
+      }
+      socialLinks[platform] = url;
+      localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
+      alert(`Thêm link ${platform.charAt(0).toUpperCase() + platform.slice(1)} thành công!`);
+      document.getElementById(`${platform}-url`).value = '';
+      updateSocialLinks();
+    };
+
+    // Hàm mở liên kết mạng xã hội
+    window.openSocialLink = function(platform) {
+      const url = socialLinks[platform];
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        alert('Chủ Trang Chưa Thêm');
+      }
+    };
+
+    // Hàm cập nhật liên kết mạng xã hội
+    function updateSocialLinks() {
+      document.getElementById('facebook-link').href = socialLinks.facebook || '#';
+      document.getElementById('zalo-link').href = socialLinks.zalo || '#';
+      document.getElementById('tiktok-link').href = socialLinks.tiktok || '#';
+      document.getElementById('youtube-link').href = socialLinks.youtube || '#';
+    }
+
     // Hàm tải dữ liệu admin
     function loadAdminData() {
       const adminAvatar = document.getElementById('admin-avatar');
@@ -562,6 +639,7 @@
 
     // Khởi tạo trạng thái ban đầu
     updateLoginState();
+    updateSocialLinks();
   </script>
 </body>
-        </html>
+  </html>
