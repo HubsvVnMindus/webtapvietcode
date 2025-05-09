@@ -306,4 +306,33 @@ a:hover {
 
 .auth-btn:last-child:hover {
   background-color: #0056b3;
+}
+
+.social-links {
+  margin-top: 1.5rem;
+}
+
+.social-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-list li {
+  margin-bottom: 0.5rem;
+}
+
+.social-list li a {
+  display: block;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.social-list li a:hover {
+  background-color: #e9ecef;
   }
