@@ -41,7 +41,7 @@
     <p>Chưa có tài khoản? <a href="#" id="to-register">Đăng ký</a></p>
   </div>
 
-  <!-- Lựa chọn sau đăng nhập -->
+  <!-- Lựa chọn sau đăng nhập (người dùng thường) -->
   <div id="options-section" class="form-container hidden">
     <h2>Chào mừng bạn!</h2>
     <div class="options">
@@ -52,11 +52,60 @@
     <button id="logout" class="logout">Đăng xuất</button>
   </div>
 
+  <!-- Giao diện admin -->
+  <div id="admin-section" class="form-container hidden">
+    <h2>Quản lý Admin</h2>
+    <div class="admin-options">
+      <!-- Thêm file cho Client VNG -->
+      <div class="form-group">
+        <h3>Thêm file cho Client VNG</h3>
+        <input type="text" id="vng-file-name" placeholder="Tên file">
+        <button onclick="addFile('vng')">Thêm File</button>
+        <ul id="vng-files" class="file-list"></ul>
+      </div>
+      <!-- Thêm file cho Client Quốc tế -->
+      <div class="form-group">
+        <h3>Thêm file cho Client Quốc tế</h3>
+        <input type="text" id="international-file-name" placeholder="Tên file">
+        <button onclick="addFile('international')">Thêm File</button>
+        <ul id="international-files" class="file-list"></ul>
+      </div>
+      <!-- Thêm Script -->
+      <div class="form-group">
+        <h3>Thêm Script</h3>
+        <textarea id="script-text" placeholder="Nhập script"></textarea>
+        <button onclick="addScript()">Thêm Script</button>
+        <ul id="script-list" class="file-list"></ul>
+      </div>
+      <!-- Thêm Hình ảnh -->
+      <div class="form-group">
+        <h3>Thêm Hình ảnh</h3>
+        <input type="text" id="image-name" placeholder="Tên hoặc URL hình ảnh">
+        <button onclick="addImage()">Thêm Hình</button>
+        <ul id="image-list" class="file-list"></ul>
+      </div>
+    </div>
+    <button id="admin-logout" class="logout">Đăng xuất</button>
+  </div>
+
   <script>
+    // Khởi tạo admin mặc định
+    const defaultAdmin = { username: 'admin', password: 'admin123', role: 'admin' };
+    if (!localStorage.getItem('users')) {
+      localStorage.setItem('users', JSON.stringify([defaultAdmin]));
+    }
+
+    // Khởi tạo danh sách file và script
+    let vngFiles = JSON.parse(localStorage.getItem('vngFiles')) || [];
+    let internationalFiles = JSON.parse(localStorage.getItem('internationalFiles')) || [];
+    let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+    let images = JSON.parse(localStorage.getItem('images')) || [];
+
     // Chuyển đổi giữa các section
     const registerSection = document.getElementById('register-section');
     const loginSection = document.getElementById('login-section');
     const optionsSection = document.getElementById('options-section');
+    const adminSection = document.getElementById('admin-section');
 
     document.getElementById('to-login').addEventListener('click', () => {
       registerSection.classList.add('hidden');
@@ -73,7 +122,13 @@
       e.preventDefault();
       const username = document.getElementById('reg-username').value;
       const password = document.getElementById('reg-password').value;
-      localStorage.setItem('user', JSON.stringify({ username, password }));
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      if (users.some(user => user.username === username)) {
+        alert('Tên người dùng đã tồn tại!');
+        return;
+      }
+      users.push({ username, password, role: 'user' });
+      localStorage.setItem('users', JSON.stringify(users));
       alert('Đăng ký thành công!');
       registerSection.classList.add('hidden');
       loginSection.classList.remove('hidden');
@@ -84,10 +139,17 @@
       e.preventDefault();
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser && storedUser.username === username && storedUser.password === password) {
-        loginSection.classList.add('hidden');
-        optionsSection.classList.remove('hidden');
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(u => u.username === username && u.password === password);
+      if (user) {
+        if (user.role === 'admin') {
+          loginSection.classList.add('hidden');
+          adminSection.classList.remove('hidden');
+          loadAdminData();
+        } else {
+          loginSection.classList.add('hidden');
+          optionsSection.classList.remove('hidden');
+        }
       } else {
         alert('Tên người dùng hoặc mật khẩu không đúng!');
       }
@@ -99,7 +161,12 @@
       loginSection.classList.remove('hidden');
     });
 
-    // Xử lý các lựa chọn
+    document.getElementById('admin-logout').addEventListener('click', () => {
+      adminSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+    });
+
+    // Xử lý các lựa chọn (người dùng thường)
     document.getElementById('client-vng').addEventListener('click', () => {
       alert('Đã chọn Client VNG');
     });
@@ -111,6 +178,69 @@
     document.getElementById('script').addEventListener('click', () => {
       alert('Đã chọn Script');
     });
+
+    // Hàm thêm file
+    window.addFile = function(type) {
+      const fileName = document.getElementById(`${type}-file-name`).value;
+      if (!fileName) {
+        alert('Vui lòng nhập tên file!');
+        return;
+      }
+      if (type === 'vng') {
+        vngFiles.push(fileName);
+        localStorage.setItem('vngFiles', JSON.stringify(vngFiles));
+      } else {
+        internationalFiles.push(fileName);
+        localStorage.setItem('internationalFiles', JSON.stringify(internationalFiles));
+      }
+      document.getElementById(`${type}-file-name`).value = '';
+      loadAdminData();
+    };
+
+    // Hàm thêm script
+    window.addScript = function() {
+      const scriptText = document.getElementById('script-text').value;
+      if (!scriptText) {
+        alert('Vui lòng nhập script!');
+        return;
+      }
+      scripts.push(scriptText);
+      localStorage.setItem('scripts', JSON.stringify(scripts));
+      document.getElementById('script-text').value = '';
+      loadAdminData();
+    };
+
+    // Hàm thêm hình ảnh
+    window.addImage = function() {
+      const imageName = document.getElementById('image-name').value;
+      if (!imageName) {
+        alert('Vui lòng nhập tên hoặc URL hình ảnh!');
+        return;
+      }
+      images.push(imageName);
+      localStorage.setItem('images', JSON.stringify(images));
+      document.getElementById('image-name').value = '';
+      loadAdminData();
+    };
+
+    // Hàm tải dữ liệu admin
+    function loadAdminData() {
+      // Hiển thị file Client VNG
+      const vngList = document.getElementById('vng-files');
+      vngList.innerHTML = vngFiles.map(file => `<li>${file}</li>`).join('');
+
+      // Hiển thị file Client Quốc tế
+      const internationalList = document.getElementById('international-files');
+      internationalList.innerHTML = internationalFiles.map(file => `<li>${file}</li>`).join('');
+
+      // Hiển thị script
+      const scriptList = document.getElementById('script-list');
+      scriptList.innerHTML = scripts.map(script => `<li>${script}</li>`).join('');
+
+      // Hiển thị hình ảnh
+      const imageList = document.getElementById('image-list');
+      imageList.innerHTML = images.map(image => `<li>${image}</li>`).join('');
+    }
   </script>
 </body>
-          </html>
+  </html>
