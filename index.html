@@ -17,7 +17,7 @@
       background: #ffffff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       width: 90%;
       max-width: 600px;
       margin: 20px auto;
@@ -48,28 +48,128 @@
       border: 1px solid #ddd;
       border-radius: 5px;
       font-size: 1em;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
     input:focus, textarea:focus {
       border-color: #1a73e8;
+      box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
       outline: none;
     }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #1a73e8;
-      color: white;
+    /* Style cho trường mật khẩu với nút ẩn/hiện */
+    .password-wrapper {
+      position: relative;
+    }
+    .password-wrapper input {
+      padding-right: 40px; /* Để chừa chỗ cho icon */
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.2em;
+      color: #666;
+      transition: color 0.3s;
+    }
+    .toggle-password:hover {
+      color: #1a73e8;
+    }
+    /* Style chung cho tất cả các nút */
+    button, .btn {
+      padding: 12px 20px;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 1em;
-      transition: background-color 0.3s;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+      display: inline-block;
     }
-    button:hover {
+    /* Nút chính (màu xanh dương) */
+    button.primary, .btn.primary {
+      background-color: #1a73e8;
+      color: white;
+    }
+    button.primary:hover, .btn.primary:hover {
       background-color: #1557b0;
+      box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+      transform: translateY(-2px);
     }
-    .auth-buttons button {
+    /* Nút đăng xuất (màu đỏ) */
+    button.logout, .btn.logout {
+      background-color: #ff4d4d;
+      color: white;
+    }
+    button.logout:hover, .btn.logout:hover {
+      background-color: #e60000;
+      box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
+      transform: scale(1.05);
+    }
+    /* Nút hành động (xóa, tải xuống) */
+    button.action, .btn.action {
+      background-color: #28a745;
+      color: white;
+      padding: 8px 15px;
+      font-size: 0.9em;
+    }
+    button.action.delete, .btn.action.delete {
+      background-color: #dc3545;
+    }
+    button.action:hover, .btn.action:hover {
+      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+      transform: translateY(-1px);
+    }
+    button.action.delete:hover, .btn.action.delete:hover {
+      background-color: #c82333;
+      box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    /* Nút trong sidebar */
+    .sidebar-menu li a {
+      display: block;
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      font-size: 1em;
+      transition: background 0.3s, transform 0.3s;
+      border-radius: 5px;
       margin: 5px 0;
+    }
+    .sidebar-menu li a:hover {
+      background: #555;
+      transform: translateX(5px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .sidebar-menu li a.logout {
+      background: #ff4d4d;
+      margin: 10px 20px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .sidebar-menu li a.logout:hover {
+      background: #e60000;
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
+    }
+    /* Cải thiện chữ "Menu" trong sidebar */
+    .sidebar-header h3 {
+      padding: 10px 20px;
+      margin: 0;
+      font-size: 1.2em;
+      font-weight: 500;
+      color: #fff;
+      background: #1a73e8;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .sidebar-header h3:hover {
+      background: #1557b0;
+      box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+      transform: translateY(-2px);
     }
     .card {
       background: #f9f9f9;
@@ -93,10 +193,11 @@
       border: 2px solid #ddd;
       border-radius: 5px;
       cursor: pointer;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
     .avatar-option:hover, .avatar-option.selected {
       border-color: #1a73e8;
+      box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
     }
     .social-links ul {
       list-style: none;
@@ -108,6 +209,12 @@
       text-decoration: none;
       color: #1a73e8;
       border-bottom: 1px solid #eee;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .social-links li a:hover {
+      background: #f0f0f0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .file-list {
       list-style: none;
@@ -148,28 +255,17 @@
     .user-table tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-    .delete-btn, .download-btn {
-      padding: 6px 12px;
-      margin-left: 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-    .delete-btn {
-      background-color: #dc3545;
-      color: white;
-    }
-    .download-btn {
-      background-color: #28a745;
-      color: white;
-    }
     .hamburger {
       position: fixed;
       top: 15px;
       left: 15px;
       cursor: pointer;
       z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+    .hamburger.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
     .hamburger div {
       width: 25px;
@@ -201,27 +297,30 @@
       position: fixed;
       top: 0;
       width: 250px;
+      border-bottom: 1px solid #555;
     }
     .close-btn {
       cursor: pointer;
       font-size: 1.5em;
+      transition: color 0.3s;
     }
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-    }
-    .sidebar-menu li a {
-      display: block;
-      padding: 15px 20px;
-      color: white;
-      text-decoration: none;
-      font-size: 1em;
-    }
-    .sidebar-menu li a:hover {
-      background: #555;
+    .close-btn:hover {
+      color: #ff4d4d;
     }
     .hidden {
       display: none !important;
+    }
+    /* Style cho liên kết "Quên mật khẩu?" */
+    .forgot-password {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      color: #1a73e8;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .forgot-password:hover {
+      text-decoration: underline;
     }
 
     /* Responsive Design */
@@ -247,8 +346,8 @@
       .sidebar-header {
         width: 200px;
       }
-      button {
-        padding: 10px;
+      button, .btn {
+        padding: 10px 15px;
         font-size: 0.9em;
       }
       input, textarea {
@@ -261,6 +360,21 @@
       .user-table th, .user-table td {
         font-size: 0.8em;
         padding: 5px;
+      }
+      .sidebar-menu li a {
+        padding: 12px 15px;
+        margin: 5px 0;
+      }
+      .sidebar-menu li a.logout {
+        margin: 10px 15px;
+        padding: 12px;
+      }
+      .sidebar-header h3 {
+        padding: 8px 15px;
+        font-size: 1.1em;
+      }
+      .forgot-password {
+        font-size: 0.8em;
       }
     }
   </style>
@@ -276,8 +390,8 @@
     <h2>Chào mừng đến với hệ thống</h2>
     <p id="login-prompt">Vui lòng đăng nhập để tiếp tục.</p>
     <div id="auth-buttons" class="auth-buttons">
-      <button onclick="showSection('register')">Đăng ký</button>
-      <button onclick="showSection('login')">Đăng nhập</button>
+      <button class="btn primary" onclick="showSection('register')">Đăng ký</button>
+      <button class="btn primary" onclick="showSection('login')">Đăng nhập</button>
     </div>
     <div id="social-links" class="social-links hidden">
       <h3>Liên kết mạng xã hội</h3>
@@ -298,10 +412,10 @@
       <span class="close-btn" onclick="toggleMenu()">×</span>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#" onclick="navigate('options')">Xem nội dung</a></li>
-      <li><a href="#" onclick="navigate('account')">Tài khoản</a></li>
-      <li><a href="#" onclick="navigate('admin')">Admin</a></li>
-      <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+      <li><a href="#" onclick="navigate('options')" class="btn primary">Xem nội dung</a></li>
+      <li><a href="#" onclick="navigate('account')" class="btn primary">Tài khoản</a></li>
+      <li><a href="#" onclick="navigate('admin')" class="btn primary">Admin</a></li>
+      <li><a href="#" onclick="logout()" class="btn logout">Đăng xuất</a></li>
     </ul>
   </div>
 
@@ -320,9 +434,12 @@
       </div>
       <div class="form-group">
         <label>Mật khẩu</label>
-        <input type="password" id="reg-password" required>
+        <div class="password-wrapper">
+          <input type="password" id="reg-password" required>
+          <span class="toggle-password" onclick="togglePassword('reg-password')">👁️</span>
+        </div>
       </div>
-      <button type="submit">Đăng ký</button>
+      <button type="submit" class="btn primary">Đăng ký</button>
     </form>
     <p>Đã có tài khoản? <a href="#" onclick="showSection('login')">Đăng nhập</a></p>
   </div>
@@ -342,10 +459,14 @@
       </div>
       <div class="form-group">
         <label>Mật khẩu</label>
-        <input type="password" id="login-password" required>
+        <div class="password-wrapper">
+          <input type="password" id="login-password" required>
+          <span class="toggle-password" onclick="togglePassword('login-password')">👁️</span>
+        </div>
       </div>
-      <button type="submit">Đăng nhập</button>
+      <button type="submit" class="btn primary">Đăng nhập</button>
     </form>
+    <a href="#" class="forgot-password" onclick="forgotPassword()">Quên mật khẩu?</a>
     <p>Chưa có tài khoản? <a href="#" onclick="showSection('register')">Đăng ký</a></p>
   </div>
 
@@ -382,25 +503,28 @@
     <div class="form-group">
       <div class="card">
         <h3>Đổi mật khẩu</h3>
-        <input type="password" id="new-password" placeholder="Mật khẩu mới">
-        <button onclick="changePassword()">Đổi mật khẩu</button>
+        <div class="password-wrapper">
+          <input type="password" id="new-password" placeholder="Mật khẩu mới">
+          <span class="toggle-password" onclick="togglePassword('new-password')">👁️</span>
+        </div>
+        <button class="btn primary" onclick="changePassword()">Đổi mật khẩu</button>
       </div>
     </div>
     <div class="form-group">
       <div class="card">
         <h3>Thêm Gmail</h3>
         <input type="email" id="gmail" placeholder="Nhập Gmail">
-        <button onclick="addGmail()">Thêm Gmail</button>
+        <button class="btn primary" onclick="addGmail()">Thêm Gmail</button>
         <p id="gmail-display"></p>
       </div>
     </div>
     <div class="form-group">
       <div class="card">
         <h3>Xóa tài khoản</h3>
-        <button onclick="deleteAccount()">Xóa tài khoản</button>
+        <button class="btn action delete" onclick="deleteAccount()">Xóa tài khoản</button>
       </div>
     </div>
-    <button onclick="showSection('home')">Quay lại</button>
+    <button class="btn primary" onclick="showSection('home')">Quay lại</button>
   </div>
 
   <!-- Lựa chọn nội dung (người dùng thường) -->
@@ -413,16 +537,16 @@
     <h2>Chọn nội dung</h2>
     <div class="form-group">
       <div class="card">
-        <button onclick="showSection('vng')">Client VNG</button>
+        <button class="btn primary" onclick="showSection('vng')">Client VNG</button>
       </div>
       <div class="card">
-        <button onclick="showSection('international')">Client Quốc tế</button>
+        <button class="btn primary" onclick="showSection('international')">Client Quốc tế</button>
       </div>
       <div class="card">
-        <button onclick="showSection('script')">Script</button>
+        <button class="btn primary" onclick="showSection('script')">Script</button>
       </div>
     </div>
-    <button onclick="showSection('home')">Quay lại</button>
+    <button class="btn primary" onclick="showSection('home')">Quay lại</button>
   </div>
 
   <!-- Hiển thị file Client VNG -->
@@ -434,7 +558,7 @@
     </div>
     <h2>Danh sách file Client VNG</h2>
     <ul id="vng-files-user" class="file-list"></ul>
-    <button onclick="showSection('options')">Quay lại</button>
+    <button class="btn primary" onclick="showSection('options')">Quay lại</button>
   </div>
 
   <!-- Hiển thị file Client Quốc tế -->
@@ -446,7 +570,7 @@
     </div>
     <h2>Danh sách file Client Quốc tế</h2>
     <ul id="international-files-user" class="file-list"></ul>
-    <button onclick="showSection('options')">Quay lại</button>
+    <button class="btn primary" onclick="showSection('options')">Quay lại</button>
   </div>
 
   <!-- Hiển thị Script và Hình ảnh -->
@@ -460,7 +584,7 @@
     <ul id="script-list-user" class="file-list"></ul>
     <h2>Danh sách Hình ảnh</h2>
     <ul id="image-list-user" class="file-list"></ul>
-    <button onclick="showSection('options')">Quay lại</button>
+    <button class="btn primary" onclick="showSection('options')">Quay lại</button>
   </div>
 
   <!-- Giao diện admin -->
@@ -489,6 +613,7 @@
               <th>Tên người dùng</th>
               <th>Gmail</th>
               <th>Role</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody id="user-table-body"></tbody>
@@ -500,7 +625,7 @@
         <h3>Thêm file cho Client VNG</h3>
         <input type="text" id="vng-file-name" placeholder="Tên file">
         <input type="text" id="vng-file-url" placeholder="Link URL">
-        <button onclick="addFile('vng')">Thêm File</button>
+        <button class="btn primary" onclick="addFile('vng')">Thêm File</button>
         <ul id="vng-files" class="file-list"></ul>
       </div>
     </div>
@@ -509,7 +634,7 @@
         <h3>Thêm file cho Client Quốc tế</h3>
         <input type="text" id="international-file-name" placeholder="Tên file">
         <input type="text" id="international-file-url" placeholder="Link URL">
-        <button onclick="addFile('international')">Thêm File</button>
+        <button class="btn primary" onclick="addFile('international')">Thêm File</button>
         <ul id="international-files" class="file-list"></ul>
       </div>
     </div>
@@ -518,7 +643,7 @@
         <h3>Thêm Script</h3>
         <input type="text" id="script-name" placeholder="Tên script">
         <textarea id="script-text" placeholder="Nội dung script"></textarea>
-        <button onclick="addScript()">Thêm Script</button>
+        <button class="btn primary" onclick="addScript()">Thêm Script</button>
         <ul id="script-list" class="file-list"></ul>
       </div>
     </div>
@@ -526,7 +651,7 @@
       <div class="card">
         <h3>Thêm Hình ảnh</h3>
         <input type="text" id="image-name" placeholder="Tên hoặc URL hình ảnh">
-        <button onclick="addImage()">Thêm Hình</button>
+        <button class="btn primary" onclick="addImage()">Thêm Hình</button>
         <ul id="image-list" class="file-list"></ul>
       </div>
     </div>
@@ -534,16 +659,16 @@
       <div class="card">
         <h3>Thêm Liên kết Mạng Xã Hội</h3>
         <input type="text" id="facebook-url" placeholder="Link Facebook">
-        <button onclick="addSocialLink('facebook')">Thêm Facebook</button>
+        <button class="btn primary" onclick="addSocialLink('facebook')">Thêm Facebook</button>
         <input type="text" id="zalo-url" placeholder="Link Zalo">
-        <button onclick="addSocialLink('zalo')">Thêm Zalo</button>
+        <button class="btn primary" onclick="addSocialLink('zalo')">Thêm Zalo</button>
         <input type="text" id="tiktok-url" placeholder="Link TikTok">
-        <button onclick="addSocialLink('tiktok')">Thêm TikTok</button>
+        <button class="btn primary" onclick="addSocialLink('tiktok')">Thêm TikTok</button>
         <input type="text" id="youtube-url" placeholder="Link Youtube">
-        <button onclick="addSocialLink('youtube')">Thêm Youtube</button>
+        <button class="btn primary" onclick="addSocialLink('youtube')">Thêm Youtube</button>
       </div>
     </div>
-    <button onclick="showSection('home')">Quay lại</button>
+    <button class="btn primary" onclick="showSection('home')">Quay lại</button>
   </div>
 
   <script>
@@ -595,7 +720,18 @@
       hamburgers.forEach(hamburger => {
         hamburger.addEventListener('click', toggleMenu);
       });
+      updateHamburgerVisibility();
     });
+
+    function updateHamburgerVisibility() {
+      const activeSection = Object.values(sections).find(sec => sec.classList.contains('active'));
+      const hamburger = activeSection.querySelector('.hamburger');
+      if (sidebar.classList.contains('open')) {
+        hamburger.classList.add('hidden');
+      } else {
+        hamburger.classList.remove('hidden');
+      }
+    }
 
     function updateLoginState() {
       if (!currentUser) {
@@ -625,10 +761,12 @@
       if (section === 'account') loadAccountData();
       if (section === 'admin') loadAdminData();
       updateLoginState();
+      updateHamburgerVisibility();
     };
 
     window.toggleMenu = function() {
       sidebar.classList.toggle('open');
+      updateHamburgerVisibility();
     };
 
     window.navigate = function(section) {
@@ -725,6 +863,7 @@
       if (confirm('Bạn có chắc muốn đăng xuất?')) {
         currentUser = null;
         showSection('home');
+        updateLoginState();
       }
     };
 
@@ -844,8 +983,42 @@
           <td>${user.username}</td>
           <td>${user.gmail || 'Chưa có'}</td>
           <td>${user.role}</td>
+          <td><button class="btn action delete" onclick="deleteUser(${user.id})">Xóa</button></td>
         </tr>
       `).join('');
+    };
+
+    window.deleteUser = function(userId) {
+      if (!currentUser || currentUser.role !== 'admin') {
+        alert('Chỉ admin có quyền xóa tài khoản!');
+        return;
+      }
+      if (confirm(`Bạn có chắc muốn xóa tài khoản với ID ${userId}?`)) {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users = users.filter(u => u.id !== userId);
+        localStorage.setItem('users', JSON.stringify(users));
+        if (currentUser.id === userId) {
+          currentUser = null;
+          showSection('home');
+        }
+        loadAdminData();
+      }
+    };
+
+    window.togglePassword = function(inputId) {
+      const input = document.getElementById(inputId);
+      const toggleIcon = input.nextElementSibling;
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggleIcon.textContent = '👁️‍🗨️'; // Biểu tượng mắt mở
+      } else {
+        input.type = 'password';
+        toggleIcon.textContent = '👁️'; // Biểu tượng mắt đóng
+      }
+    };
+
+    window.forgotPassword = function() {
+      alert('Vui lòng liên hệ admin để khôi phục mật khẩu.');
     };
 
     function loadAccountData() {
@@ -877,29 +1050,29 @@
       const vngList = document.getElementById('vng-files');
       vngList.innerHTML = vngFiles.map((file, index) => `
         <li>
-          ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
-          <button class="delete-btn" onclick="deleteFile('vng', ${index})">Xóa</button>
+          ${file.name} ${file.url ? `<button class="btn action" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+          <button class="btn action delete" onclick="deleteFile('vng', ${index})">Xóa</button>
         </li>
       `).join('');
       const internationalList = document.getElementById('international-files');
       internationalList.innerHTML = internationalFiles.map((file, index) => `
         <li>
-          ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
-          <button class="delete-btn" onclick="deleteFile('international', ${index})">Xóa</button>
+          ${file.name} ${file.url ? `<button class="btn action" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+          <button class="btn action delete" onclick="deleteFile('international', ${index})">Xóa</button>
         </li>
       `).join('');
       const scriptList = document.getElementById('script-list');
       scriptList.innerHTML = scripts.map((script, index) => `
         <li>
           <strong>${script.name}</strong>: ${script.content}
-          <button class="delete-btn" onclick="deleteScript(${index})">Xóa</button>
+          <button class="btn action delete" onclick="deleteScript(${index})">Xóa</button>
         </li>
       `).join('');
       const imageList = document.getElementById('image-list');
       imageList.innerHTML = images.map((image, index) => `
         <li>
           ${image}
-          <button class="delete-btn" onclick="deleteImage(${index})">Xóa</button>
+          <button class="btn action delete" onclick="deleteImage(${index})">Xóa</button>
         </li>
       `).join('');
     }
@@ -910,7 +1083,7 @@
         vngList.innerHTML = vngFiles.length > 0
           ? vngFiles.map(file => `
               <li>
-                ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+                ${file.name} ${file.url ? `<button class="btn action" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
               </li>
             `).join('')
           : '<li>Chưa có file nào.</li>';
@@ -919,7 +1092,7 @@
         internationalList.innerHTML = internationalFiles.length > 0
           ? internationalFiles.map(file => `
               <li>
-                ${file.name} ${file.url ? `<button class="download-btn" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
+                ${file.name} ${file.url ? `<button class="btn action" onclick="window.open('${file.url}', '_blank')">Tải xuống</button>` : ''}
               </li>
             `).join('')
           : '<li>Chưa có file nào.</li>';
@@ -946,4 +1119,4 @@
     updateSocialLinks();
   </script>
 </body>
-      </html>
+  </html>
