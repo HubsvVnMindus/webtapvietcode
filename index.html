@@ -19,7 +19,7 @@
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       width: 90%;
-      max-width: 500px;
+      max-width: 600px;
       margin: 20px auto;
       display: none;
       position: relative;
@@ -118,6 +118,35 @@
       padding: 10px;
       background: #f9f9f9;
       border-radius: 5px;
+    }
+    .user-list {
+      list-style: none;
+      padding: 0;
+    }
+    .user-list li {
+      margin: 10px 0;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .user-table th, .user-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .user-table th {
+      background-color: #1a73e8;
+      color: white;
+    }
+    .user-table tr:nth-child(even) {
+      background-color: #f2f2f2;
     }
     .delete-btn, .download-btn {
       padding: 6px 12px;
@@ -229,6 +258,10 @@
         width: 50px;
         height: 50px;
       }
+      .user-table th, .user-table td {
+        font-size: 0.8em;
+        padding: 5px;
+      }
     }
   </style>
 </head>
@@ -330,9 +363,15 @@
         <img id="user-avatar" class="avatar" alt="Avatar người dùng" style="width: 100px;">
         <div class="avatar-select">
           <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-option" onclick="changeAvatar(this)" data-url="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-          <img src="https://i.imgur.com/oJHpVuH.jpeg" class="avatar-option" onclick="changeAvatar(this)" data-url="https://i.imgur.com/oJHpVuH.jpeg">
-          <img src="https://i.imgur.com/LqdqKWC.jpeg" class="avatar-option" onclick="changeAvatar(this)" data-url="https://i.imgur.com/LqdqKWC.jpeg">
+          <img src="https://i.imgur.com/Uz2h1qN.jpeg" class="avatar-option" onclick="changeAvatar(this)" data-url="https://i.imgur.com/Uz2h1qN.jpeg">
+          <img src="https://i.imgur.com/4jK8vW3.jpeg" class="avatar-option" onclick="changeAvatar(this)" data-url="https://i.imgur.com/4jK8vW3.jpeg">
         </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="card">
+        <h3>Thông tin</h3>
+        <p>ID: <span id="user-id"></span></p>
       </div>
     </div>
     <div class="form-group">
@@ -436,6 +475,23 @@
     </div>
     <div class="form-group">
       <div class="card">
+        <h3>Danh sách người dùng</h3>
+        <input type="text" id="search-user-id" placeholder="Tìm kiếm theo ID" oninput="filterUsers()">
+        <table id="user-table" class="user-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên người dùng</th>
+              <th>Gmail</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody id="user-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="card">
         <h3>Thêm file cho Client VNG</h3>
         <input type="text" id="vng-file-name" placeholder="Tên file">
         <input type="text" id="vng-file-url" placeholder="Link URL">
@@ -486,8 +542,12 @@
   </div>
 
   <script>
+    // Tạo ID tự tăng
+    let userIdCounter = 1;
+
     // Khởi tạo admin mặc định
     const defaultAdmin = { 
+      id: userIdCounter++,
       username: 'Hungdeptrai', 
       password: 'hungdeptrai345@', 
       role: 'admin', 
@@ -588,7 +648,15 @@
         alert('Tên người dùng đã tồn tại!');
         return;
       }
-      users.push({ username, password, role: 'user', gmail: '', avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' });
+      const newUser = {
+        id: userIdCounter++,
+        username,
+        password,
+        role: 'user',
+        gmail: '',
+        avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+      };
+      users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
       alert('Đăng ký thành công!');
       showSection('login');
@@ -758,12 +826,30 @@
       }
     };
 
+    window.filterUsers = function() {
+      const searchId = document.getElementById('search-user-id').value;
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const filteredUsers = searchId
+        ? users.filter(user => user.id.toString().startsWith(searchId))
+        : users;
+      const userTableBody = document.getElementById('user-table-body');
+      userTableBody.innerHTML = filteredUsers.map(user => `
+        <tr>
+          <td>${user.id}</td>
+          <td>${user.username}</td>
+          <td>${user.gmail || 'Chưa có'}</td>
+          <td>${user.role}</td>
+        </tr>
+      `).join('');
+    };
+
     function loadAccountData() {
       const gmailDisplay = document.getElementById('gmail-display');
       gmailDisplay.textContent = currentUser.gmail ? `Gmail hiện tại: ${currentUser.gmail}` : 'Chưa có Gmail.';
       const userAvatar = document.getElementById('user-avatar');
       userAvatar.src = currentUser.avatar;
-      // Highlight selected avatar
+      const userIdDisplay = document.getElementById('user-id');
+      userIdDisplay.textContent = currentUser.id;
       document.querySelectorAll('.avatar-option').forEach(option => {
         if (option.getAttribute('data-url') === currentUser.avatar) {
           option.classList.add('selected');
@@ -776,6 +862,7 @@
     function loadAdminData() {
       const adminAvatar = document.getElementById('admin-avatar');
       adminAvatar.src = currentUser.avatar;
+      filterUsers(); // Load user table
       const vngList = document.getElementById('vng-files');
       vngList.innerHTML = vngFiles.map((file, index) => `
         <li>
