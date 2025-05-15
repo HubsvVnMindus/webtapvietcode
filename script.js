@@ -14,8 +14,10 @@ function showNotification(message, isSuccess) {
     const notification = document.getElementById('notification');
     notification.textContent = message;
     notification.classList.remove('hidden');
+    notification.classList.add('show');
     notification.classList.add(isSuccess ? 'success' : 'error');
     setTimeout(() => {
+        notification.classList.remove('show');
         notification.classList.add('hidden');
         notification.classList.remove(isSuccess ? 'success' : 'error');
     }, 3000);
@@ -59,8 +61,10 @@ signupForm.addEventListener('submit', (e) => {
             }).then(() => {
                 showNotification('Đăng Ký Thành Công ✅', true);
                 signupForm.reset();
-                loginFormBox.classList.remove('hidden');
-                signupFormBox.classList.add('hidden');
+                setTimeout(() => {
+                    loginFormBox.classList.remove('hidden');
+                    signupFormBox.classList.add('hidden');
+                }, 3000); // Chờ 3 giây để thông báo hiển thị
             });
         })
         .catch((error) => {
@@ -80,7 +84,7 @@ loginForm.addEventListener('submit', (e) => {
             loginForm.reset();
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 2000);
+            }, 3000); // Chờ 3 giây để thông báo hiển thị
         })
         .catch((error) => {
             showNotification('Đăng Nhập Thất Bại ❌', false);
@@ -96,8 +100,10 @@ forgotPasswordForm.addEventListener('submit', (e) => {
         .then(() => {
             showNotification('Gửi Link Đặt Lại Mật Khẩu Thành Công ✅', true);
             forgotPasswordForm.reset();
-            loginFormBox.classList.remove('hidden');
-            forgotPasswordFormBox.classList.add('hidden');
+            setTimeout(() => {
+                loginFormBox.classList.remove('hidden');
+                forgotPasswordFormBox.classList.add('hidden');
+            }, 3000); // Chờ 3 giây để thông báo hiển thị
         })
         .catch((error) => {
             showNotification('Gửi Link Đặt Lại Mật Khẩu Thất Bại ❌', false);
