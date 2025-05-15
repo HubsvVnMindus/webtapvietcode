@@ -9,6 +9,18 @@ const showLogin = document.getElementById('show-login');
 const showForgotPassword = document.getElementById('show-forgot-password');
 const showLoginFromForgot = document.getElementById('show-login-from-forgot');
 
+// Hàm hiển thị thông báo
+function showNotification(message, isSuccess) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.remove('hidden');
+    notification.classList.add(isSuccess ? 'success' : 'error');
+    setTimeout(() => {
+        notification.classList.add('hidden');
+        notification.classList.remove(isSuccess ? 'success' : 'error');
+    }, 3000);
+}
+
 // Chuyển đổi giữa các form
 showSignup.addEventListener('click', () => {
     loginFormBox.classList.add('hidden');
@@ -42,18 +54,17 @@ signupForm.addEventListener('submit', (e) => {
 
     firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            // Cập nhật tên người dùng (email) sau khi đăng ký
             userCredential.user.updateProfile({
-                displayName: email.split('@')[0] // Lấy phần trước @ làm tên
+                displayName: email.split('@')[0]
             }).then(() => {
-                alert('Đăng ký thành công!');
+                showNotification('Đăng Ký Thành Công ✅', true);
                 signupForm.reset();
                 loginFormBox.classList.remove('hidden');
                 signupFormBox.classList.add('hidden');
             });
         })
         .catch((error) => {
-            alert('Lỗi: ' + error.message);
+            showNotification('Đăng Ký Thất Bại ❌', false);
         });
 });
 
@@ -65,12 +76,14 @@ loginForm.addEventListener('submit', (e) => {
 
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            alert('Đăng nhập thành công!');
+            showNotification('Đăng Nhập Thành Công ✅', true);
             loginForm.reset();
-            window.location.href = 'dashboard.html';
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
         })
         .catch((error) => {
-            alert('Lỗi: ' + error.message);
+            showNotification('Đăng Nhập Thất Bại ❌', false);
         });
 });
 
@@ -81,13 +94,13 @@ forgotPasswordForm.addEventListener('submit', (e) => {
 
     firebase.auth().sendPasswordResetEmail(email)
         .then(() => {
-            alert('Link đặt lại mật khẩu đã được gửi đến email của bạn!');
+            showNotification('Gửi Link Đặt Lại Mật Khẩu Thành Công ✅', true);
             forgotPasswordForm.reset();
             loginFormBox.classList.remove('hidden');
             forgotPasswordFormBox.classList.add('hidden');
         })
         .catch((error) => {
-            alert('Lỗi: ' + error.message);
+            showNotification('Gửi Link Đặt Lại Mật Khẩu Thất Bại ❌', false);
         });
 });
 
@@ -104,4 +117,4 @@ function togglePassword(inputId) {
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
     }
-                                     }
+}
