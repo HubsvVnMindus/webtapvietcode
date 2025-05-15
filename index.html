@@ -52,132 +52,21 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (Mô-đun ES) -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-
-        // Cấu hình Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCHdKxEd5Y12tLNufyIVri3LvHnaxl9kt4",
-            authDomain: "test-5fa6d.firebaseapp.com",
-            projectId: "test-5fa6d",
-            storageBucket: "test-5fa6d.firebasestorage.app",
-            messagingSenderId: "738112109950",
-            appId: "1:738112109950:web:f1ba6af2e2b58d825b472f",
-            measurementId: "G-GHFB48YK6W"
-        };
-
-        // Khởi tạo Firebase
-        try {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            window.auth = auth; // Xuất auth để sử dụng trong script.js
-            console.log('Firebase khởi tạo thành công');
-        } catch (error) {
-            console.error('Lỗi khởi tạo Firebase:', error);
-            showNotification('Lỗi cấu hình Firebase ❌', false);
-        }
-
-        // Hàm hiển thị thông báo (dùng trong module để báo lỗi Firebase)
-        function showNotification(message, isSuccess) {
-            try {
-                const notification = document.getElementById('notification');
-                if (!notification) {
-                    console.error('Không tìm thấy phần tử notification');
-                    return;
-                }
-                notification.textContent = message;
-                notification.classList.remove('hidden', 'success', 'error');
-                notification.classList.add(isSuccess ? 'success' : 'error', 'show');
-                setTimeout(() => {
-                    notification.classList
-
-System: I'm sorry, but it looks like the response was cut off. Let me help complete the solution and ensure the notification issue is fully resolved. I'll provide the corrected `index.html`, `dashboard.html`, `script.js`, and `styles.css` files, incorporating the Firebase configuration you provided, ensuring the API key is correctly used, and addressing the notification display issue. I'll also explain why the notifications might not be showing and verify the setup.
-
----
-
-### Why Notifications Might Not Be Showing
-Based on your input and the previous code, the most likely reasons for notifications not appearing include:
-1. **Firebase Initialization Failure**: If the API key or Firebase configuration is incorrect, Firebase won't initialize, causing authentication functions to fail silently, and no notifications will be triggered.
-2. **Module Scope Issues**: The previous code used ES modules (`<script type="module">`), which have a different scope. If `script.js` tries to access `auth` incorrectly, it may cause errors.
-3. **CSS Transition Timing**: The notification's slide-in effect might not be visible if the page redirects or changes state too quickly.
-4. **Browser or Network Issues**: If the Firebase SDK fails to load (due to network issues or browser restrictions), or if the browser doesn't support ES modules, the app won't work as expected.
-
-Since you provided a valid `firebaseConfig` with the API key `AIzaSyCHdKxEd5Y12tLNufyIVri3LvHnaxl9kt4`, I'll use it and revert to using Firebase's CDN (instead of ES modules) to simplify debugging and ensure compatibility, as this was the original setup. I'll also keep the notification delay at 4 seconds and add more robust error handling.
-
-### Updated Code
-Below are the corrected files, ensuring the API key is properly integrated and notifications work.
-
-<xaiArtifact artifact_id="5d672c80-630e-4c72-8ef1-dc8f0bd8b0de" artifact_version_id="011f46d6-1a87-47b6-9043-6aa6e483e740" title="index.html" contentType="text/html">
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập & Đăng ký</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome for eye icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Google Fonts: Roboto -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <!-- Thông báo -->
-        <div id="notification" class="notification hidden"></div>
-        <!-- Form Đăng nhập -->
-        <div class="form-box" id="login-form">
-            <h2>Đăng nhập</h2>
-            <form id="login">
-                <input type="email" id="login-email" placeholder="Email" required>
-                <div class="password-container">
-                    <input type="password" id="login-password" placeholder="Mật khẩu" required>
-                    <span class="toggle-password" onclick="togglePassword('login-password')"><i class="fas fa-eye"></i></span>
-                </div>
-                <button type="submit">Đăng nhập</button>
-            </form>
-            <p><a href="#" id="show-forgot-password">Quên mật khẩu?</a></p>
-            <p>Chưa có tài khoản? <a href="#" id="show-signup">Đăng ký</a></p>
-        </div>
-        <!-- Form Đăng ký -->
-        <div class="form-box hidden" id="signup-form">
-            <h2>Đăng ký</h2>
-            <form id="signup">
-                <input type="email" id="signup-email" placeholder="Email" required>
-                <div class="password-container">
-                    <input type="password" id="signup-password" placeholder="Mật khẩu" required>
-                    <span class="toggle-password" onclick="togglePassword('signup-password')"><i class="fas fa-eye"></i></span>
-                </div>
-                <button type="submit">Đăng ký</button>
-            </form>
-            <p>Đã có tài khoản? <a href="#" id="show-login">Đăng nhập</a></p>
-        </div>
-        <!-- Form Quên mật khẩu -->
-        <div class="form-box hidden" id="forgot-password-form">
-            <h2>Quên mật khẩu</h2>
-            <form id="forgot-password">
-                <input type="email" id="forgot-password-email" placeholder="Email" required>
-                <button type="submit">Gửi link đặt lại</button>
-            </form>
-            <p><a href="#" id="show-login-from-forgot">Quay lại đăng nhập</a></p>
-        </div>
-    </div>
-
     <!-- Firebase SDK (CDN) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
     <script>
         // Cấu hình Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyCHdKxEd5Y12tLNufyIVri3LvHnaxl9kt4",
-            authDomain: "test-5fa6d.firebaseapp.com",
-            projectId: "test-5fa6d",
-            storageBucket: "test-5fa6d.firebasestorage.app",
-            messagingSenderId: "738112109950",
-            appId: "1:738112109950:web:f1ba6af2e2b58d825b472f",
-            measurementId: "G-GHFB48YK6W"
-        };
+        const firebaseConfig = {
+  apiKey: "AIzaSyCHdKxEd5Y12tLNufyIVri3LvHnaxl9kt4",
+  authDomain: "test-5fa6d.firebaseapp.com",
+  projectId: "test-5fa6d",
+  storageBucket: "test-5fa6d.firebasestorage.app",
+  messagingSenderId: "738112109950",
+  appId: "1:738112109950:web:f1ba6af2e2b58d825b472f",
+  measurementId: "G-GHFB48YK6W"
+};
 
         // Khởi tạo Firebase
         try {
@@ -185,10 +74,10 @@ Below are the corrected files, ensuring the API key is properly integrated and n
             console.log('Firebase khởi tạo thành công');
         } catch (error) {
             console.error('Lỗi khởi tạo Firebase:', error);
-            showNotification('Lỗi cấu hình Firebase ❌', false);
+            showNotification('Lỗi cấu hình Firebase: ' + error.message, false);
         }
 
-        // Hàm hiển thị thông báo (dùng trong script inline)
+        // Hàm hiển thị thông báo
         function showNotification(message, isSuccess) {
             try {
                 const notification = document.getElementById('notification');
