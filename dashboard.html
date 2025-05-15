@@ -25,14 +25,14 @@
     <script>
         // Cấu hình Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyCHdKxEd5Y12tLNufyIVri3LvHnaxl9kt4",
-            authDomain: "test-5fa6d.firebaseapp.com",
-            projectId: "test-5fa6d",
-            storageBucket: "test-5fa6d.firebasestorage.app",
-            messagingSenderId: "738112109950",
-            appId: "1:738112109950:web:f1ba6af2e2b58d825b472f",
-            measurementId: "G-GHFB48YK6W"
-        };
+  apiKey: "AIzaSyCHdKxEd5Y12tLNufyIVri3LvHnaxl9kt4",
+  authDomain: "test-5fa6d.firebaseapp.com",
+  projectId: "test-5fa6d",
+  storageBucket: "test-5fa6d.firebasestorage.app",
+  messagingSenderId: "738112109950",
+  appId: "1:738112109950:web:f1ba6af2e2b58d825b472f",
+  measurementId: "G-GHFB48YK6W"
+};
 
         // Khởi tạo Firebase
         try {
@@ -40,7 +40,7 @@
             console.log('Firebase khởi tạo thành công');
         } catch (error) {
             console.error('Lỗi khởi tạo Firebase:', error);
-            showNotification('Lỗi cấu hình Firebase ❌', false);
+            showNotification('Lỗi cấu hình Firebase: ' + error.message, false);
         }
 
         // Hiển thị tên người dùng
@@ -63,7 +63,7 @@
                     }, 4000);
                 })
                 .catch((error) => {
-                    showNotification('Đăng Xuất Thất Bại ❌', false);
+                    showNotification('Đăng Xuất Thất Bại ❌: ' + error.message, false);
                     console.error('Lỗi đăng xuất:', error);
                 });
         }
@@ -89,4 +89,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
