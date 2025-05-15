@@ -38,7 +38,7 @@ showSignup.addEventListener('click', () => {
 
 showLogin.addEventListener('click', () => {
     signupFormBox.classList.add('hidden');
-    loginFormBox.classList/remove('hidden');
+    loginFormBox.classList.remove('hidden');
     forgotPasswordFormBox.classList.add('hidden');
 });
 
@@ -72,7 +72,7 @@ signupForm.addEventListener('submit', (e) => {
                     signupFormBox.classList.add('hidden');
                 }, 4000);
             }).catch((error) => {
-                showNotification('Lỗi Cập Nhật Hồ Sơ ❌', false);
+                showNotification('Lỗi Cập Nhật Hồ Sơ ❌: ' + error.message, false);
                 console.error('Lỗi cập nhật profile:', error);
             });
         })
@@ -139,4 +139,4 @@ function togglePassword(inputId) {
     } catch (error) {
         console.error('Lỗi khi toggle mật khẩu:', error);
     }
-        }
+                                  }
