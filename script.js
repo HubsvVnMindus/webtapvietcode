@@ -23,7 +23,7 @@ function showNotification(message, isSuccess) {
         setTimeout(() => {
             notification.classList.remove('show');
             notification.classList.add('hidden');
-        }, 4000); // Tăng thời gian hiển thị lên 4 giây
+        }, 4000);
     } catch (error) {
         console.error('Lỗi khi hiển thị thông báo:', error);
     }
@@ -38,7 +38,7 @@ showSignup.addEventListener('click', () => {
 
 showLogin.addEventListener('click', () => {
     signupFormBox.classList.add('hidden');
-    loginFormBox.classList.remove('hidden');
+    loginFormBox.classList/remove('hidden');
     forgotPasswordFormBox.classList.add('hidden');
 });
 
@@ -70,14 +70,14 @@ signupForm.addEventListener('submit', (e) => {
                 setTimeout(() => {
                     loginFormBox.classList.remove('hidden');
                     signupFormBox.classList.add('hidden');
-                }, 4000); // Chờ 4 giây để thông báo hiển thị
+                }, 4000);
             }).catch((error) => {
                 showNotification('Lỗi Cập Nhật Hồ Sơ ❌', false);
                 console.error('Lỗi cập nhật profile:', error);
             });
         })
         .catch((error) => {
-            showNotification('Đăng Ký Thất Bại ❌', false);
+            showNotification('Đăng Ký Thất Bại ❌: ' + error.message, false);
             console.error('Lỗi đăng ký:', error);
         });
 });
@@ -94,10 +94,10 @@ loginForm.addEventListener('submit', (e) => {
             loginForm.reset();
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 4000); // Chờ 4 giây để thông báo hiển thị
+            }, 4000);
         })
         .catch((error) => {
-            showNotification('Đăng Nhập Thất Bại ❌', false);
+            showNotification('Đăng Nhập Thất Bại ❌: ' + error.message, false);
             console.error('Lỗi đăng nhập:', error);
         });
 });
@@ -114,25 +114,29 @@ forgotPasswordForm.addEventListener('submit', (e) => {
             setTimeout(() => {
                 loginFormBox.classList.remove('hidden');
                 forgotPasswordFormBox.classList.add('hidden');
-            }, 4000); // Chờ 4 giây để thông báo hiển thị
+            }, 4000);
         })
         .catch((error) => {
-            showNotification('Gửi Link Đặt Lại Mật Khẩu Thất Bại ❌', false);
+            showNotification('Gửi Link Đặt Lại Mật Khẩu Thất Bại ❌: ' + error.message, false);
             console.error('Lỗi gửi email đặt lại mật khẩu:', error);
         });
 });
 
 // Hàm ẩn/hiện mật khẩu
 function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    const icon = input.nextElementSibling.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+    try {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    } catch (error) {
+        console.error('Lỗi khi toggle mật khẩu:', error);
     }
         }
